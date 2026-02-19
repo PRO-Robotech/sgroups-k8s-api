@@ -1,0 +1,2923 @@
+{
+	"info": {
+		"_postman_id": "f0e1d2c3-b4a5-6789-0abc-def123456789",
+		"name": "sgroups.io API Smoke Tests",
+		"description": "CRUD + selector + error-handling + immutability + namespace-isolation + delete-collection smoke tests for sgroups.io custom API server via kubectl proxy.\n\nRequires `kubectl proxy --port=8001` running.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "tenantRV",
+			"value": ""
+		},
+		{
+			"key": "agRV",
+			"value": ""
+		},
+		{
+			"key": "immutUID",
+			"value": ""
+		},
+		{
+			"key": "immutCT",
+			"value": ""
+		},
+		{
+			"key": "immutRV",
+			"value": ""
+		},
+		{
+			"key": "nsDeleteAttempt",
+			"value": "0"
+		}
+	],
+	"item": [
+		{
+			"name": "Pre-cleanup",
+			"description": "Idempotent cleanup of leftover resources from previous runs. Accepts both 200 (deleted) and 404 (already gone).",
+			"item": [
+				{
+					"name": "Delete all AGs in namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Cleaned up (200 or 404)', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete tenant: postman-test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Cleaned up (200 or 404)', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete tenant: postman-helper",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Cleaned up (200 or 404)', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/postman-helper",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"postman-helper"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete tenant: immut-test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Cleaned up (200 or 404)', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/immut-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"immut-test"
+							]
+						}
+					}
+				},
+				{
+					"name": "Force-finalize namespace (unstick Terminating)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Accept any response: 200 (finalized), 404 (doesn't exist), 409 (conflict)",
+									"pm.test('Finalize accepted', () => pm.expect(pm.response.code).to.be.below(500));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"v1\",\n  \"kind\": \"Namespace\",\n  \"metadata\": {\"name\": \"{{namespace}}\"},\n  \"spec\": {\"finalizers\": []}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/{{namespace}}/finalize",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"{{namespace}}",
+								"finalize"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Cleaned up (200 or 404)', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/{{namespace}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"{{namespace}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Force-finalize ns-lifecycle-test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Finalize accepted', () => pm.expect(pm.response.code).to.be.below(500));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"v1\",\n  \"kind\": \"Namespace\",\n  \"metadata\": {\n    \"name\": \"ns-lifecycle-test\"\n  },\n  \"spec\": {\n    \"finalizers\": []\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/ns-lifecycle-test/finalize",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"ns-lifecycle-test",
+								"finalize"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete ns-lifecycle-test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Cleaned up (200 or 404)', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/ns-lifecycle-test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"ns-lifecycle-test"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify no test tenants remain",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"const testNames = ['postman-test', 'postman-helper', 'immut-test'];",
+									"pm.test('No leftover test tenants', () => {",
+									"    const leftovers = body.items.filter(t => testNames.includes(t.metadata.name));",
+									"    pm.expect(leftovers).to.have.lengthOf(0);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Create Tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is Tenant', () => pm.expect(body.kind).to.eql('Tenant'));",
+									"pm.test('Name matches', () => pm.expect(body.metadata.name).to.eql(pm.variables.get('tenantName')));",
+									"pm.test('API version is correct', () => pm.expect(body.apiVersion).to.eql('sgroups.io/v1alpha1'));",
+									"pm.test('Labels are set', () => {",
+									"    pm.expect(body.metadata.labels).to.have.property('env', 'test');",
+									"    pm.expect(body.metadata.labels).to.have.property('team', 'platform');",
+									"});",
+									"pm.collectionVariables.set('tenantRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {\n    \"name\": \"{{tenantName}}\",\n    \"labels\": {\"env\": \"test\", \"team\": \"platform\"}\n  },\n  \"spec\": {\n    \"displayName\": \"Postman Test Tenant\",\n    \"comment\": \"created by postman\",\n    \"description\": \"Tenant for smoke tests\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create K8s Namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is Namespace', () => pm.expect(body.kind).to.eql('Namespace'));",
+									"pm.test('Name matches', () => pm.expect(body.metadata.name).to.eql(pm.variables.get('namespace')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"v1\",\n  \"kind\": \"Namespace\",\n  \"metadata\": {\n    \"name\": \"{{namespace}}\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tenant CRUD",
+			"item": [
+				{
+					"name": "Get Tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is Tenant', () => pm.expect(body.kind).to.eql('Tenant'));",
+									"pm.test('Name matches', () => pm.expect(body.metadata.name).to.eql(pm.variables.get('tenantName')));",
+									"pm.test('DisplayName is set', () => pm.expect(body.spec.displayName).to.eql('Postman Test Tenant'));",
+									"pm.test('Comment is set', () => pm.expect(body.spec.comment).to.eql('created by postman'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is TenantList', () => pm.expect(body.kind).to.eql('TenantList'));",
+									"pm.test('Items is not empty', () => pm.expect(body.items.length).to.be.at.least(1));",
+									"const found = body.items.some(t => t.metadata.name === pm.variables.get('tenantName'));",
+									"pm.test('Our tenant is in list', () => pm.expect(found).to.be.true);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is Tenant', () => pm.expect(body.kind).to.eql('Tenant'));",
+									"pm.test('DisplayName updated', () => pm.expect(body.spec.displayName).to.eql('Updated Tenant'));",
+									"pm.test('Comment updated', () => pm.expect(body.spec.comment).to.eql('updated by postman'));",
+									"pm.collectionVariables.set('tenantRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {\n    \"name\": \"{{tenantName}}\",\n    \"resourceVersion\": \"{{tenantRV}}\",\n    \"labels\": {\"env\": \"test\", \"team\": \"platform\"}\n  },\n  \"spec\": {\n    \"displayName\": \"Updated Tenant\",\n    \"comment\": \"updated by postman\",\n    \"description\": \"Tenant updated via PUT\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Patch Tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is Tenant', () => pm.expect(body.kind).to.eql('Tenant'));",
+									"pm.test('Comment patched', () => pm.expect(body.spec.comment).to.eql('patched by postman'));",
+									"pm.test('DisplayName preserved', () => pm.expect(body.spec.displayName).to.eql('Updated Tenant'));",
+									"pm.collectionVariables.set('tenantRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/merge-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"spec\": {\n    \"comment\": \"patched by postman\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "AddressGroup CRUD",
+			"item": [
+				{
+					"name": "Create AddressGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroup', () => pm.expect(body.kind).to.eql('AddressGroup'));",
+									"pm.test('Name matches', () => pm.expect(body.metadata.name).to.eql(pm.variables.get('agName')));",
+									"pm.test('Namespace matches', () => pm.expect(body.metadata.namespace).to.eql(pm.variables.get('namespace')));",
+									"pm.test('DefaultAction is ALLOW', () => pm.expect(body.spec.defaultAction).to.eql('ALLOW'));",
+									"pm.test('Logs is true', () => pm.expect(body.spec.logs).to.be.true);",
+									"pm.test('Labels are set', () => {",
+									"    pm.expect(body.metadata.labels).to.have.property('env', 'test');",
+									"    pm.expect(body.metadata.labels).to.have.property('team', 'platform');",
+									"});",
+									"pm.collectionVariables.set('agRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\n    \"name\": \"{{agName}}\",\n    \"namespace\": \"{{namespace}}\",\n    \"labels\": {\"env\": \"test\", \"team\": \"platform\"}\n  },\n  \"spec\": {\n    \"displayName\": \"Test Address Group\",\n    \"comment\": \"created by postman\",\n    \"description\": \"AddressGroup for smoke tests\",\n    \"defaultAction\": \"ALLOW\",\n    \"logs\": true,\n    \"trace\": false\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get AddressGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroup', () => pm.expect(body.kind).to.eql('AddressGroup'));",
+									"pm.test('Name matches', () => pm.expect(body.metadata.name).to.eql(pm.variables.get('agName')));",
+									"pm.test('DefaultAction is ALLOW', () => pm.expect(body.spec.defaultAction).to.eql('ALLOW'));",
+									"pm.test('Logs is true', () => pm.expect(body.spec.logs).to.be.true);",
+									"pm.test('DisplayName is set', () => pm.expect(body.spec.displayName).to.eql('Test Address Group'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/{{agName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"{{agName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "List AddressGroups (namespaced)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroupList', () => pm.expect(body.kind).to.eql('AddressGroupList'));",
+									"pm.test('Items is not empty', () => pm.expect(body.items.length).to.be.at.least(1));",
+									"const found = body.items.some(ag => ag.metadata.name === pm.variables.get('agName'));",
+									"pm.test('Our AG is in list', () => pm.expect(found).to.be.true);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "List AddressGroups (all namespaces)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroupList', () => pm.expect(body.kind).to.eql('AddressGroupList'));",
+									"const found = body.items.some(ag => ag.metadata.name === pm.variables.get('agName') && ag.metadata.namespace === pm.variables.get('namespace'));",
+									"pm.test('Our AG is in cross-namespace list', () => pm.expect(found).to.be.true);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update AddressGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroup', () => pm.expect(body.kind).to.eql('AddressGroup'));",
+									"pm.test('DefaultAction is DENY', () => pm.expect(body.spec.defaultAction).to.eql('DENY'));",
+									"pm.test('Comment updated', () => pm.expect(body.spec.comment).to.eql('updated by postman'));",
+									"pm.collectionVariables.set('agRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\n    \"name\": \"{{agName}}\",\n    \"namespace\": \"{{namespace}}\",\n    \"resourceVersion\": \"{{agRV}}\",\n    \"labels\": {\"env\": \"test\", \"team\": \"platform\"}\n  },\n  \"spec\": {\n    \"displayName\": \"Updated Address Group\",\n    \"comment\": \"updated by postman\",\n    \"description\": \"AddressGroup updated via PUT\",\n    \"defaultAction\": \"DENY\",\n    \"logs\": true,\n    \"trace\": false\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/{{agName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"{{agName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Patch AddressGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroup', () => pm.expect(body.kind).to.eql('AddressGroup'));",
+									"pm.test('Trace is true', () => pm.expect(body.spec.trace).to.be.true);",
+									"pm.test('DefaultAction preserved', () => pm.expect(body.spec.defaultAction).to.eql('DENY'));",
+									"pm.collectionVariables.set('agRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/merge-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"spec\": {\n    \"trace\": true\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/{{agName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"{{agName}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Selectors",
+			"item": [
+				{
+					"name": "Create helper Tenant (env=staging)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"const body = pm.response.json();",
+									"pm.test('Labels correct', () => {",
+									"    pm.expect(body.metadata.labels.env).to.eql('staging');",
+									"    pm.expect(body.metadata.labels.team).to.eql('infra');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {\n    \"name\": \"postman-helper\",\n    \"labels\": {\"env\": \"staging\", \"team\": \"infra\"}\n  },\n  \"spec\": {\"displayName\": \"Helper Tenant\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create helper AddressGroup (env=staging)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"const body = pm.response.json();",
+									"pm.test('Labels correct', () => {",
+									"    pm.expect(body.metadata.labels.env).to.eql('staging');",
+									"    pm.expect(body.metadata.labels.team).to.eql('infra');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\n    \"name\": \"helper-ag\",\n    \"namespace\": \"{{namespace}}\",\n    \"labels\": {\"env\": \"staging\", \"team\": \"infra\"}\n  },\n  \"spec\": {\"defaultAction\": \"DENY\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants by label env=test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Kind is TenantList', () => pm.expect(body.kind).to.eql('TenantList'));",
+									"pm.test('Only env=test tenants returned', () => {",
+									"    pm.expect(body.items.length).to.be.at.least(1);",
+									"    body.items.forEach(t => pm.expect(t.metadata.labels.env).to.eql('test'));",
+									"});",
+									"pm.test('Our tenant is found', () => {",
+									"    const found = body.items.some(t => t.metadata.name === pm.variables.get('tenantName'));",
+									"    pm.expect(found).to.be.true;",
+									"});",
+									"pm.test('Helper tenant is NOT found', () => {",
+									"    const found = body.items.some(t => t.metadata.name === 'postman-helper');",
+									"    pm.expect(found).to.be.false;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?labelSelector=env=test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "env=test"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants by label env=staging",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Only env=staging tenants returned', () => {",
+									"    pm.expect(body.items.length).to.be.at.least(1);",
+									"    body.items.forEach(t => pm.expect(t.metadata.labels.env).to.eql('staging'));",
+									"});",
+									"pm.test('Helper tenant is found', () => {",
+									"    const found = body.items.some(t => t.metadata.name === 'postman-helper');",
+									"    pm.expect(found).to.be.true;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?labelSelector=env=staging",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "env=staging"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants by two labels (AND)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Exactly our tenant returned', () => {",
+									"    pm.expect(body.items.length).to.eql(1);",
+									"    pm.expect(body.items[0].metadata.name).to.eql(pm.variables.get('tenantName'));",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?labelSelector=env=test,team=platform",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "env=test,team=platform"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants by nonexistent label",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Kind is TenantList', () => pm.expect(body.kind).to.eql('TenantList'));",
+									"pm.test('Items is empty', () => pm.expect(body.items).to.have.lengthOf(0));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?labelSelector=env=nonexistent",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "env=nonexistent"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants by fieldSelector metadata.name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Exactly one tenant returned', () => pm.expect(body.items.length).to.eql(1));",
+									"pm.test('Name matches', () => pm.expect(body.items[0].metadata.name).to.eql(pm.variables.get('tenantName')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?fieldSelector=metadata.name={{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "fieldSelector",
+									"value": "metadata.name={{tenantName}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants by fieldSelector nonexistent name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Items is empty', () => pm.expect(body.items).to.have.lengthOf(0));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?fieldSelector=metadata.name=does-not-exist",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "fieldSelector",
+									"value": "metadata.name=does-not-exist"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List AGs by label env=test (namespaced)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Only env=test AGs returned', () => {",
+									"    pm.expect(body.items.length).to.be.at.least(1);",
+									"    body.items.forEach(ag => pm.expect(ag.metadata.labels.env).to.eql('test'));",
+									"});",
+									"pm.test('Our AG is found', () => {",
+									"    const found = body.items.some(ag => ag.metadata.name === pm.variables.get('agName'));",
+									"    pm.expect(found).to.be.true;",
+									"});",
+									"pm.test('Helper AG is NOT found', () => {",
+									"    const found = body.items.some(ag => ag.metadata.name === 'helper-ag');",
+									"    pm.expect(found).to.be.false;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?labelSelector=env=test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "env=test"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List AGs by label env=test (all namespaces)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Only env=test AGs returned', () => {",
+									"    pm.expect(body.items.length).to.be.at.least(1);",
+									"    body.items.forEach(ag => pm.expect(ag.metadata.labels.env).to.eql('test'));",
+									"});",
+									"pm.test('Helper AG is NOT in results', () => {",
+									"    const found = body.items.some(ag => ag.metadata.name === 'helper-ag');",
+									"    pm.expect(found).to.be.false;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/addressgroups?labelSelector=env=test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "env=test"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List AGs by fieldSelector metadata.name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Exactly one AG returned', () => pm.expect(body.items.length).to.eql(1));",
+									"pm.test('Name matches', () => pm.expect(body.items[0].metadata.name).to.eql(pm.variables.get('agName')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?fieldSelector=metadata.name={{agName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "fieldSelector",
+									"value": "metadata.name={{agName}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete helper AddressGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/helper-ag",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"helper-ag"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete helper Tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/postman-helper",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"postman-helper"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Error Handling",
+			"item": [
+				{
+					"name": "GET nonexistent Tenant → 404",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Reason is NotFound', () => pm.expect(body.reason).to.eql('NotFound'));",
+									"pm.test('Kind is Status', () => pm.expect(body.kind).to.eql('Status'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/does-not-exist",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"does-not-exist"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET nonexistent AddressGroup → 404",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Reason is NotFound', () => pm.expect(body.reason).to.eql('NotFound'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/does-not-exist",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"does-not-exist"
+							]
+						}
+					}
+				},
+				{
+					"name": "PUT nonexistent Tenant → 404",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Reason is NotFound', () => pm.expect(body.reason).to.eql('NotFound'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {\"name\": \"does-not-exist\", \"resourceVersion\": \"1\"},\n  \"spec\": {\"displayName\": \"ghost\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/does-not-exist",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"does-not-exist"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST Tenant with empty body → error",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 4xx', () => {",
+									"    pm.expect(pm.response.code).to.be.within(400, 499);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST Tenant with malformed JSON → error",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 4xx', () => {",
+									"    pm.expect(pm.response.code).to.be.within(400, 499);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{this is not json!!!"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "POST Tenant without name → error",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 4xx', () => {",
+									"    pm.expect(pm.response.code).to.be.within(400, 499);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {},\n  \"spec\": {\"displayName\": \"No name\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants with invalid labelSelector → 400",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Reason is BadRequest', () => pm.expect(body.reason).to.eql('BadRequest'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?labelSelector=!!invalid!!",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "!!invalid!!"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Tenants with unsupported fieldSelector → 400",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Reason is BadRequest', () => pm.expect(body.reason).to.eql('BadRequest'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?fieldSelector=spec.displayName=foo",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "fieldSelector",
+									"value": "spec.displayName=foo"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "PATCH with server-side apply → 415",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 415', () => pm.response.to.have.status(415));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/apply-patch+yaml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "apiVersion: sgroups.io/v1alpha1\nkind: Tenant\nmetadata:\n  name: {{tenantName}}\nspec:\n  comment: ssa attempt\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Immutability",
+			"item": [
+				{
+					"name": "Create tenant for immutability test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"const body = pm.response.json();",
+									"pm.test('Has UID', () => pm.expect(body.metadata.uid).to.be.a('string').and.not.empty);",
+									"pm.test('Has creationTimestamp', () => pm.expect(body.metadata.creationTimestamp).to.be.a('string').and.not.empty);",
+									"pm.collectionVariables.set('immutUID', body.metadata.uid);",
+									"pm.collectionVariables.set('immutCT', body.metadata.creationTimestamp);",
+									"pm.collectionVariables.set('immutRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {\"name\": \"immut-test\"},\n  \"spec\": {\"displayName\": \"Immutability Test\", \"comment\": \"original\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							]
+						}
+					}
+				},
+				{
+					"name": "PUT update — UID and creationTimestamp preserved",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('UID unchanged', () => pm.expect(body.metadata.uid).to.eql(pm.collectionVariables.get('immutUID')));",
+									"pm.test('creationTimestamp unchanged', () => pm.expect(body.metadata.creationTimestamp).to.eql(pm.collectionVariables.get('immutCT')));",
+									"pm.test('resourceVersion changed', () => pm.expect(body.metadata.resourceVersion).to.not.eql(pm.collectionVariables.get('immutRV')));",
+									"pm.test('Spec updated', () => pm.expect(body.spec.comment).to.eql('updated via PUT'));",
+									"pm.collectionVariables.set('immutRV', body.metadata.resourceVersion);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"Tenant\",\n  \"metadata\": {\"name\": \"immut-test\", \"resourceVersion\": \"{{immutRV}}\"},\n  \"spec\": {\"displayName\": \"Immutability Test\", \"comment\": \"updated via PUT\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/immut-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"immut-test"
+							]
+						}
+					}
+				},
+				{
+					"name": "PATCH update — UID and creationTimestamp preserved",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('UID unchanged', () => pm.expect(body.metadata.uid).to.eql(pm.collectionVariables.get('immutUID')));",
+									"pm.test('creationTimestamp unchanged', () => pm.expect(body.metadata.creationTimestamp).to.eql(pm.collectionVariables.get('immutCT')));",
+									"pm.test('Spec patched', () => pm.expect(body.spec.comment).to.eql('patched'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/merge-patch+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"spec\": {\"comment\": \"patched\"}}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/immut-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"immut-test"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete immutability test tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/immut-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"immut-test"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Namespace Isolation",
+			"item": [
+				{
+					"name": "Create AG in postman-test namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));",
+									"const body = pm.response.json();",
+									"pm.test('Namespace is postman-test', () => pm.expect(body.metadata.namespace).to.eql(pm.variables.get('namespace')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\"name\": \"isolation-ag\", \"namespace\": \"{{namespace}}\"},\n  \"spec\": {\"defaultAction\": \"ALLOW\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "List AGs in default namespace → our AG absent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Kind is AddressGroupList', () => pm.expect(body.kind).to.eql('AddressGroupList'));",
+									"pm.test('isolation-ag is NOT in default namespace', () => {",
+									"    const found = body.items.some(ag => ag.metadata.name === 'isolation-ag');",
+									"    pm.expect(found).to.be.false;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/default/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"default",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "List AGs in postman-test namespace → our AG present",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('isolation-ag IS in postman-test namespace', () => {",
+									"    const found = body.items.some(ag => ag.metadata.name === 'isolation-ag');",
+									"    pm.expect(found).to.be.true;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "GET AG with wrong namespace → 404",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+									"const body = pm.response.json();",
+									"pm.test('Reason is NotFound', () => pm.expect(body.reason).to.eql('NotFound'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/default/addressgroups/isolation-ag",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"default",
+								"addressgroups",
+								"isolation-ag"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete isolation AG",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/isolation-ag",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"isolation-ag"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "DeleteCollection",
+			"item": [
+				{
+					"name": "Create dc-ag-1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\"name\": \"dc-ag-1\", \"namespace\": \"{{namespace}}\", \"labels\": {\"batch\": \"dc-test\"}},\n  \"spec\": {\"defaultAction\": \"ALLOW\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create dc-ag-2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\"name\": \"dc-ag-2\", \"namespace\": \"{{namespace}}\", \"labels\": {\"batch\": \"dc-test\"}},\n  \"spec\": {\"defaultAction\": \"DENY\"}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify 2 dc-test AGs exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Both dc-test AGs present', () => {",
+									"    pm.expect(body.items.length).to.eql(2);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?labelSelector=batch=dc-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "batch=dc-test"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "DELETE collection with labelSelector",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Status is Success', () => pm.expect(body.status).to.eql('Success'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?labelSelector=batch=dc-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "batch=dc-test"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify dc-test AGs gone",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('No dc-test AGs remain', () => pm.expect(body.items).to.have.lengthOf(0));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?labelSelector=batch=dc-test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "labelSelector",
+									"value": "batch=dc-test"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify main AG not deleted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Main AG still exists', () => pm.expect(body.metadata.name).to.eql(pm.variables.get('agName')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups/{{agName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups",
+								"{{agName}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Watch",
+			"item": [
+				{
+					"name": "Watch Tenants — initial snapshot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"const lines = pm.response.text().trim().split('\\n').filter(l => l.length > 0);",
+									"pm.test('At least one event received', () => pm.expect(lines.length).to.be.at.least(1));",
+									"",
+									"const event = JSON.parse(lines[0]);",
+									"pm.test('Event type is ADDED', () => pm.expect(event.type).to.eql('ADDED'));",
+									"pm.test('Object kind is Tenant', () => pm.expect(event.object.kind).to.eql('Tenant'));",
+									"pm.test('Object has metadata', () => pm.expect(event.object.metadata.name).to.be.a('string'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?watch=true&timeoutSeconds=2",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "watch",
+									"value": "true"
+								},
+								{
+									"key": "timeoutSeconds",
+									"value": "2"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Watch Tenants — fieldSelector match",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"const lines = pm.response.text().trim().split('\\n').filter(l => l.length > 0);",
+									"const events = lines.map(l => JSON.parse(l)).filter(e => e.type !== 'BOOKMARK');",
+									"pm.test('At least one data event', () => pm.expect(events.length).to.be.at.least(1));",
+									"",
+									"const event = events[0];",
+									"pm.test('Event type is ADDED', () => pm.expect(event.type).to.eql('ADDED'));",
+									"pm.test('Name matches fieldSelector', () => pm.expect(event.object.metadata.name).to.eql(pm.variables.get('tenantName')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?watch=true&timeoutSeconds=2&fieldSelector=metadata.name={{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "watch",
+									"value": "true"
+								},
+								{
+									"key": "timeoutSeconds",
+									"value": "2"
+								},
+								{
+									"key": "fieldSelector",
+									"value": "metadata.name={{tenantName}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Watch Tenants — fieldSelector no match",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"const lines = pm.response.text().trim().split('\\n').filter(l => l.length > 0);",
+									"const events = lines.map(l => JSON.parse(l)).filter(e => e.type !== 'BOOKMARK');",
+									"pm.test('No data events received', () => pm.expect(events).to.have.lengthOf(0));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants?watch=true&timeoutSeconds=2&fieldSelector=metadata.name=does-not-exist",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants"
+							],
+							"query": [
+								{
+									"key": "watch",
+									"value": "true"
+								},
+								{
+									"key": "timeoutSeconds",
+									"value": "2"
+								},
+								{
+									"key": "fieldSelector",
+									"value": "metadata.name=does-not-exist"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Watch AddressGroups — namespaced snapshot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"const lines = pm.response.text().trim().split('\\n').filter(l => l.length > 0);",
+									"pm.test('At least one event received', () => pm.expect(lines.length).to.be.at.least(1));",
+									"",
+									"const event = JSON.parse(lines[0]);",
+									"pm.test('Event type is ADDED', () => pm.expect(event.type).to.eql('ADDED'));",
+									"pm.test('Object kind is AddressGroup', () => pm.expect(event.object.kind).to.eql('AddressGroup'));",
+									"pm.test('Object namespace matches', () => pm.expect(event.object.metadata.namespace).to.eql(pm.variables.get('namespace')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?watch=true&timeoutSeconds=2",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "watch",
+									"value": "true"
+								},
+								{
+									"key": "timeoutSeconds",
+									"value": "2"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Watch AddressGroups — labelSelector filter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"",
+									"const lines = pm.response.text().trim().split('\\n').filter(l => l.length > 0);",
+									"const events = lines.map(l => JSON.parse(l)).filter(e => e.type !== 'BOOKMARK');",
+									"pm.test('At least one data event received', () => pm.expect(events.length).to.be.at.least(1));",
+									"",
+									"events.forEach((event, i) => {",
+									"    pm.test(`Event ${i} object has label env=test`, () => {",
+									"        pm.expect(event.object.metadata.labels.env).to.eql('test');",
+									"    });",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups?watch=true&timeoutSeconds=2&labelSelector=env=test",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							],
+							"query": [
+								{
+									"key": "watch",
+									"value": "true"
+								},
+								{
+									"key": "timeoutSeconds",
+									"value": "2"
+								},
+								{
+									"key": "labelSelector",
+									"value": "env=test"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Namespace Lifecycle",
+			"description": "Verifies namespace deletion completes when namespace contains custom resources. The namespace must NOT get stuck in Terminating — this validates WatchList BOOKMARK support.",
+			"item": [
+				{
+					"name": "Create lifecycle namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"v1\",\n  \"kind\": \"Namespace\",\n  \"metadata\": {\n    \"name\": \"ns-lifecycle-test\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create AG lifecycle-ag-1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\n    \"name\": \"lifecycle-ag-1\",\n    \"namespace\": \"ns-lifecycle-test\"\n  },\n  \"spec\": {\n    \"defaultAction\": \"ALLOW\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/ns-lifecycle-test/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"ns-lifecycle-test",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create AG lifecycle-ag-2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\n    \"name\": \"lifecycle-ag-2\",\n    \"namespace\": \"ns-lifecycle-test\"\n  },\n  \"spec\": {\n    \"defaultAction\": \"DENY\",\n    \"logs\": true\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/ns-lifecycle-test/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"ns-lifecycle-test",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create AG lifecycle-ag-3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201', () => pm.response.to.have.status(201));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"apiVersion\": \"sgroups.io/v1alpha1\",\n  \"kind\": \"AddressGroup\",\n  \"metadata\": {\n    \"name\": \"lifecycle-ag-3\",\n    \"namespace\": \"ns-lifecycle-test\"\n  },\n  \"spec\": {\n    \"defaultAction\": \"ALLOW\",\n    \"trace\": true\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/ns-lifecycle-test/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"ns-lifecycle-test",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify 3 AGs exist in namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('3 AddressGroups in namespace', () => pm.expect(body.items.length).to.eql(3));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/ns-lifecycle-test/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"ns-lifecycle-test",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete namespace (resources still inside)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('DELETE accepted', () => pm.expect(pm.response.code).to.be.oneOf([200, 202]));",
+									"// Reset retry counter for polling",
+									"pm.collectionVariables.set('nsDeleteAttempt', '0');"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/ns-lifecycle-test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"ns-lifecycle-test"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify namespace fully deleted",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Delay 1s between polling attempts via pm.sendRequest to a slow endpoint",
+									"const attempt = parseInt(pm.collectionVariables.get('nsDeleteAttempt') || '0');",
+									"if (attempt > 0) {",
+									"    // Wait 1s before retrying",
+									"    const start = Date.now();",
+									"    while (Date.now() - start < 1000) { /* busy-wait */ }",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const attempt = parseInt(pm.collectionVariables.get('nsDeleteAttempt') || '0');",
+									"",
+									"if (pm.response.code === 404) {",
+									"    pm.test('Namespace fully deleted (not stuck in Terminating)', () => {",
+									"        pm.expect(pm.response.code).to.eql(404);",
+									"    });",
+									"    pm.collectionVariables.set('nsDeleteAttempt', '0');",
+									"} else if (attempt < 30) {",
+									"    // Namespace still exists — retry (phase is likely Terminating)",
+									"    pm.collectionVariables.set('nsDeleteAttempt', String(attempt + 1));",
+									"    pm.execution.setNextRequest('Verify namespace fully deleted');",
+									"} else {",
+									"    // Exceeded 30 attempts (~30s) — namespace is stuck",
+									"    const body = pm.response.json();",
+									"    const phase = body.status && body.status.phase ? body.status.phase : 'unknown';",
+									"    pm.test('Namespace deleted within 30s (not stuck in Terminating)', () => {",
+									"        throw new Error('Namespace stuck in phase: ' + phase + ' after 30 attempts');",
+									"    });",
+									"    pm.collectionVariables.set('nsDeleteAttempt', '0');",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/ns-lifecycle-test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"ns-lifecycle-test"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cleanup",
+			"description": "Delete ALL resources created during the test run. Uses DeleteCollection for AGs and removes all known tenants.",
+			"item": [
+				{
+					"name": "Delete all AGs in namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Status is Success', () => pm.expect(body.status).to.eql('Success'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete K8s Namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/namespaces/{{namespace}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"namespaces",
+								"{{namespace}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify Tenant Gone",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404', () => pm.response.to.have.status(404));",
+									"pm.test('Response is JSON', () => pm.response.to.be.json);",
+									"const body = pm.response.json();",
+									"pm.test('Reason is NotFound', () => pm.expect(body.reason).to.eql('NotFound'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/tenants/{{tenantName}}",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"tenants",
+								"{{tenantName}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify no AGs remain in namespace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('No AGs remain', () => pm.expect(body.items).to.have.lengthOf(0));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiBase}}/namespaces/{{namespace}}/addressgroups",
+							"host": [
+								"{{baseUrl}}{{apiBase}}"
+							],
+							"path": [
+								"namespaces",
+								"{{namespace}}",
+								"addressgroups"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}
