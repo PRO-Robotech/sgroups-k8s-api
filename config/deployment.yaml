@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sgroups-k8s-apiserver
+  namespace: sgroups-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sgroups-k8s-apiserver
+  template:
+    metadata:
+      labels:
+        app: sgroups-k8s-apiserver
+    spec:
+      serviceAccountName: sgroups-k8s-apiserver
+      containers:
+        - name: apiserver
+          image: sgroups-k8s-apiserver:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config=/etc/sgroups/config/config.yaml
+          ports:
+            - name: https
+              containerPort: 8443
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: apiserver-tls
+              mountPath: /etc/sgroups/tls
+              readOnly: true
+            - name: apiserver-config
+              mountPath: /etc/sgroups/config
+              readOnly: true
+      volumes:
+        - name: apiserver-tls
+          secret:
+            secretName: sgroups-apiserver-tls
+        - name: apiserver-config
+          configMap:
+            name: sgroups-apiserver-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgroups-k8s-apiserver
+  namespace: sgroups-system
+spec:
+  selector:
+    app: sgroups-k8s-apiserver
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443

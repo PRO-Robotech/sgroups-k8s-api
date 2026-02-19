@@ -1,0 +1,49 @@
+# Mock gRPC backend — remove from kustomization.yaml when switching to the real backend.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sgroups-backend
+  namespace: sgroups-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sgroups-backend
+  template:
+    metadata:
+      labels:
+        app: sgroups-backend
+    spec:
+      containers:
+        - name: mock
+          image: sgroups-mock-backend:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --addr=:8081
+          ports:
+            - name: grpc
+              containerPort: 8081
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgroups-backend
+  namespace: sgroups-system
+spec:
+  selector:
+    app: sgroups-backend
+  ports:
+    - name: grpc
+      port: 8081
+      targetPort: 8081

@@ -1,0 +1,19 @@
+serving:
+  securePort: 8443
+  tlsCertFile: /etc/sgroups/tls/tls.crt
+  tlsPrivateKeyFile: /etc/sgroups/tls/tls.key
+
+grpc:
+  address: "sgroups-backend.sgroups-system.svc:8081"
+  insecure: true
+  timeout: 30s
+  ca: ""
+  cert: ""
+  key: ""
+  serverName: ""
+  maxRecvMsgSize: 16777216
+  keepaliveTime: 30s
+  keepaliveTimeout: 10s
+  permitWithoutStream: true
+  minConnectTimeout: 10s
+  backoffMaxDelay: 120s
