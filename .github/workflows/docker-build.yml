@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile.apiserver
+          file: ./apiserver.Dockerfile
           push: true
           provenance: false
           platforms: linux/amd64
@@ -126,7 +126,7 @@ jobs:
   #       uses: docker/build-push-action@v6
   #       with:
   #         context: .
-  #         file: ./Dockerfile.apiserver
+  #         file: ./apiserver.Dockerfile
   #         push: true
   #         provenance: false
   #         platforms: linux/arm64
