@@ -17,6 +17,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout sgroups-proto
+        uses: actions/checkout@v4
+        with:
+          repository: PRO-Robotech/sgroups-proto
+          path: sgroups-proto
+
       - uses: benjlevesque/short-sha@v3.0
         id: short-sha
         with:
@@ -61,6 +67,8 @@ jobs:
         with:
           context: .
           file: ./apiserver.Dockerfile
+          build-contexts: |
+            sgroups-proto=./sgroups-proto
           push: true
           provenance: false
           platforms: linux/amd64
