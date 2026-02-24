@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: PRO-Robotech/sgroups-proto
+          ref: feature-cloud-432-proto-ns-ag
           path: sgroups-proto
 
       - uses: benjlevesque/short-sha@v3.0

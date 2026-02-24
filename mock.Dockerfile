@@ -1,6 +1,6 @@
 FROM golang:1.25 AS builder
 WORKDIR /workspace
-COPY --from=sgroups-proto / sgroups-proto/
+COPY --from=sgroups-proto /. /workspace/sgroups-proto/
 COPY . sgroups-k8s-api/
 WORKDIR /workspace/sgroups-k8s-api
 RUN CGO_ENABLED=0 go build -o /sgroups-k8s-api ./cmd/sgroups-k8s-api
