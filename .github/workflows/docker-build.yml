@@ -17,20 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract sgroups-proto commit from go.mod
-        id: proto-ref
+      - name: Checkout sgroups-proto at go.mod commit
         run: |
           # Go pseudo-version format: v0.0.0-YYYYMMDDHHMMSS-<commit12>
           PROTO_VERSION=$(grep 'github.com/PRO-Robotech/sgroups-proto' go.mod | grep -v replace | awk '{print $2}')
           PROTO_COMMIT=$(echo "$PROTO_VERSION" | sed 's/.*-//')
-          echo "commit=$PROTO_COMMIT" >> $GITHUB_OUTPUT
-
-      - name: Checkout sgroups-proto
-        uses: actions/checkout@v4
-        with:
-          repository: PRO-Robotech/sgroups-proto
-          ref: ${{ steps.proto-ref.outputs.commit }}
-          path: sgroups-proto
+          git clone https://github.com/PRO-Robotech/sgroups-proto.git sgroups-proto
+          cd sgroups-proto
+          git checkout "$PROTO_COMMIT"
 
       - uses: benjlevesque/short-sha@v3.0
         id: short-sha
