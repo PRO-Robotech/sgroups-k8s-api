@@ -1,0 +1,53 @@
+# Bootstrap: SelfSigned issuer to create a CA certificate.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: sgroups-selfsigned
+  namespace: sgroups-system
+spec:
+  selfSigned: {}
+---
+# CA certificate issued by the SelfSigned issuer.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sgroups-ca
+  namespace: sgroups-system
+spec:
+  isCA: true
+  commonName: sgroups-ca
+  secretName: sgroups-ca-key-pair
+  duration: 87600h # 10 years
+  issuerRef:
+    name: sgroups-selfsigned
+    kind: Issuer
+---
+# CA issuer backed by the CA certificate above.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: sgroups-ca-issuer
+  namespace: sgroups-system
+spec:
+  ca:
+    secretName: sgroups-ca-key-pair
+---
+# Serving certificate for the aggregated API server.
+# cert-manager's cainjector reads this to populate APIService.spec.caBundle.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sgroups-apiserver-cert
+  namespace: sgroups-system
+spec:
+  secretName: sgroups-apiserver-tls
+  duration: 8760h # 1 year
+  renewBefore: 720h # 30 days
+  issuerRef:
+    name: sgroups-ca-issuer
+    kind: Issuer
+  dnsNames:
+    - sgroups-k8s-apiserver
+    - sgroups-k8s-apiserver.sgroups-system
+    - sgroups-k8s-apiserver.sgroups-system.svc
+    - sgroups-k8s-apiserver.sgroups-system.svc.cluster.local
