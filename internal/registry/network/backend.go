@@ -1,4 +1,4 @@
-package addressgroup
+package network
 
 import (
 	"context"
@@ -23,13 +23,15 @@ type backend struct {
 	client *client.Client
 }
 
-func (b *backend) NamespaceScoped() bool { return true }
-
-func (b *backend) Resource() schema.GroupResource {
-	return v1alpha1.Resource(v1alpha1.ResourceAddressGroups)
+func (b *backend) NamespaceScoped() bool {
+	return true
 }
 
-func (b *backend) List(ctx context.Context, sel base.Selection) (*v1alpha1.AddressGroupList, error) {
+func (b *backend) Resource() schema.GroupResource {
+	return v1alpha1.Resource(v1alpha1.ResourceNetworks)
+}
+
+func (b *backend) List(ctx context.Context, sel base.Selection) (*v1alpha1.NetworkList, error) {
 	resSelector := &common.ResSelector{
 		LabelSelector: sel.Labels,
 	}
@@ -40,22 +42,22 @@ func (b *backend) List(ctx context.Context, sel base.Selection) (*v1alpha1.Addre
 		}
 	}
 
-	req := &sgroupsv1.AddressGroupReq_List{Selectors: []*common.ResSelector{resSelector}}
-	resp, err := b.client.AddressGroups.List(ctx, req)
+	req := &sgroupsv1.NetworkReq_List{Selectors: []*common.ResSelector{resSelector}}
+	resp, err := b.client.Networks.List(ctx, req)
 	if err != nil {
 		return nil, regerrors.FromGRPC(err, b.Resource(), sel.Name)
 	}
 
-	out := &v1alpha1.AddressGroupList{
+	out := &v1alpha1.NetworkList{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       v1alpha1.KindAddressGroupList,
+			Kind:       v1alpha1.KindNetworkList,
 			APIVersion: v1alpha1.SchemeGroupVersion.String(),
 		},
-		Items: make([]v1alpha1.AddressGroup, 0, len(resp.GetAddressGroups())),
+		Items: make([]v1alpha1.Network, 0, len(resp.GetNetworks())),
 	}
 	out.ResourceVersion = resp.GetResourceVersion()
-	for _, ag := range resp.GetAddressGroups() {
-		if converted := convert.AddressGroupFromProtoExt(ag); converted != nil {
+	for _, nw := range resp.GetNetworks() {
+		if converted := convert.NetworkFromProtoExt(nw); converted != nil {
 			out.Items = append(out.Items, *converted)
 		}
 	}
@@ -63,24 +65,24 @@ func (b *backend) List(ctx context.Context, sel base.Selection) (*v1alpha1.Addre
 	return out, nil
 }
 
-func (b *backend) Upsert(ctx context.Context, obj *v1alpha1.AddressGroup) (*v1alpha1.AddressGroup, error) {
-	req := &sgroupsv1.AddressGroupReq_Upsert{
-		AddressGroups: []*sgroupsv1.AddressGroup{convert.AddressGroupToProto(obj)},
+func (b *backend) Upsert(ctx context.Context, obj *v1alpha1.Network) (*v1alpha1.Network, error) {
+	req := &sgroupsv1.NetworkReq_Upsert{
+		Networks: []*sgroupsv1.Network{convert.NetworkToProto(obj)},
 	}
-	resp, err := b.client.AddressGroups.Upsert(ctx, req)
+	resp, err := b.client.Networks.Upsert(ctx, req)
 	if err != nil {
 		return nil, regerrors.FromGRPC(err, b.Resource(), obj.Name)
 	}
-	if len(resp.GetAddressGroups()) == 0 {
+	if len(resp.GetNetworks()) == 0 {
 		return nil, apierrors.NewInternalError(errors.New("empty upsert response"))
 	}
 
-	return convert.AddressGroupFromProto(resp.GetAddressGroups()[0]), nil
+	return convert.NetworkFromProto(resp.GetNetworks()[0]), nil
 }
 
 func (b *backend) Delete(ctx context.Context, name, namespace string) error {
-	req := &sgroupsv1.AddressGroupReq_Delete{
-		AddressGroups: []*sgroupsv1.AddressGroupReq_Delete_AddressGroup{
+	req := &sgroupsv1.NetworkReq_Delete{
+		Networks: []*sgroupsv1.NetworkReq_Delete_Network{
 			{
 				Metadata: &common.MetadataScope{
 					Name:      name,
@@ -89,7 +91,7 @@ func (b *backend) Delete(ctx context.Context, name, namespace string) error {
 			},
 		},
 	}
-	_, err := b.client.AddressGroups.Delete(ctx, req)
+	_, err := b.client.Networks.Delete(ctx, req)
 	if err != nil {
 		return regerrors.FromGRPC(err, b.Resource(), name)
 	}
@@ -108,12 +110,12 @@ func (b *backend) Watch(ctx context.Context, sel base.Selection, resourceVersion
 		}
 	}
 
-	req := &sgroupsv1.AddressGroupReq_Watch{
+	req := &sgroupsv1.NetworkReq_Watch{
 		ResourceVersion: resourceVersion,
 		Selectors:       []*common.ResSelector{resSelector},
 	}
 	ctx, cancel := context.WithCancel(ctx)
-	stream, err := b.client.AddressGroups.Watch(ctx, req)
+	stream, err := b.client.Networks.Watch(ctx, req)
 	if err != nil {
 		cancel()
 
@@ -123,14 +125,14 @@ func (b *backend) Watch(ctx context.Context, sel base.Selection, resourceVersion
 	return base.NewStreamWatch(
 		cancel,
 		stream.Recv,
-		func(evt *sgroupsv1.AddressGroupResp_Watch) common.WatchEventType {
+		func(evt *sgroupsv1.NetworkResp_Watch) common.WatchEventType {
 			return evt.GetType()
 		},
-		func(evt *sgroupsv1.AddressGroupResp_Watch) []*sgroupsv1.AddressGroupResp_AddressGroupExt {
-			return evt.GetAddressGroups()
+		func(evt *sgroupsv1.NetworkResp_Watch) []*sgroupsv1.NetworkResp_NetworkExt {
+			return evt.GetNetworks()
 		},
-		func(ag *sgroupsv1.AddressGroupResp_AddressGroupExt) runtime.Object {
-			return convert.AddressGroupFromProtoExt(ag)
+		func(nw *sgroupsv1.NetworkResp_NetworkExt) runtime.Object {
+			return convert.NetworkFromProtoExt(nw)
 		},
 	), nil
 }

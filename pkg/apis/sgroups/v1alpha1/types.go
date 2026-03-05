@@ -11,12 +11,16 @@ const (
 
 	KindAddressGroup     = "AddressGroup"
 	KindAddressGroupList = "AddressGroupList"
+
+	KindNetwork     = "Network"
+	KindNetworkList = "NetworkList"
 )
 
 // Resource plural name constants.
 const (
 	ResourceTenants       = "tenants"
 	ResourceAddressGroups = "addressgroups"
+	ResourceNetworks      = "networks"
 )
 
 // Action represents the default action for an AddressGroup.
@@ -77,6 +81,30 @@ type AddressGroupList struct {
 	Items           []AddressGroup `json:"items"`
 }
 
+// NetworkSpec defines the desired state of a Network.
+type NetworkSpec struct {
+	DisplayName string `json:"displayName,omitempty"`
+	Comment     string `json:"comment,omitempty"`
+	Description string `json:"description,omitempty"`
+	CIDR        string `json:"CIDR,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// Network represents a network resource.
+type Network struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              NetworkSpec `json:"spec,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// NetworkList is a list of Network resources.
+type NetworkList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Network `json:"items"`
+}
+
 // ---------- OpenAPIModelName ----------
 // The Kubernetes DefinitionNamer converts Go import paths (slashes) to
 // dot-separated names. Types must implement OpenAPIModelName to match,
@@ -93,3 +121,6 @@ func (TenantSpec) OpenAPIModelName() string       { return OpenAPIPrefix + "Tena
 func (AddressGroup) OpenAPIModelName() string     { return OpenAPIPrefix + "AddressGroup" }
 func (AddressGroupList) OpenAPIModelName() string { return OpenAPIPrefix + "AddressGroupList" }
 func (AddressGroupSpec) OpenAPIModelName() string { return OpenAPIPrefix + "AddressGroupSpec" }
+func (Network) OpenAPIModelName() string          { return OpenAPIPrefix + "Network" }
+func (NetworkList) OpenAPIModelName() string      { return OpenAPIPrefix + "NetworkList" }
+func (NetworkSpec) OpenAPIModelName() string      { return OpenAPIPrefix + "NetworkSpec" }

@@ -19,7 +19,7 @@ import (
 
 func TestTenantStorageCreateList(t *testing.T) {
 	mb := mock.New()
-	b := appbackend.Backend{Namespaces: mb, AddressGroups: mb}
+	b := appbackend.Backend{Namespaces: mb, AddressGroups: mb, Networks: mb}
 	cli, cleanup := testutil.NewBufconnClient(t, b)
 	defer cleanup()
 
@@ -63,7 +63,7 @@ func TestTenantStorageCreateList(t *testing.T) {
 
 func TestTenantStorageWatch(t *testing.T) {
 	mb := mock.New()
-	b := appbackend.Backend{Namespaces: mb, AddressGroups: mb}
+	b := appbackend.Backend{Namespaces: mb, AddressGroups: mb, Networks: mb}
 	cli, cleanup := testutil.NewBufconnClient(t, b)
 	defer cleanup()
 

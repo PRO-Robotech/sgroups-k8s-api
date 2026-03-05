@@ -168,12 +168,14 @@ func (s *Storage[T, TList]) Watch(ctx context.Context, opts *metainternalversion
 	listObj, err := s.backend.List(ctx, sel)
 	if err != nil {
 		innerWatch.Stop()
+
 		return nil, err
 	}
 
 	items, err := meta.ExtractList(listObj)
 	if err != nil {
 		innerWatch.Stop()
+
 		return nil, apierrors.NewInternalError(err)
 	}
 
@@ -186,6 +188,16 @@ func (s *Storage[T, TList]) Watch(ctx context.Context, opts *metainternalversion
 	return base.NewWatchListWatch(innerWatch, items, func() runtime.Object {
 		return s.newT()
 	}, listRV), nil
+}
+
+func preserveObjectMetaFields(target, source metav1.Object) {
+	if target.GetUID() == "" {
+		target.SetUID(source.GetUID())
+	}
+	ct := target.GetCreationTimestamp()
+	if ct.IsZero() {
+		target.SetCreationTimestamp(source.GetCreationTimestamp())
+	}
 }
 
 func (s *Storage[T, TList]) Create(
@@ -274,15 +286,8 @@ func (s *Storage[T, TList]) Update(
 
 	// Preserve immutable fields from the existing object (standard K8s PrepareForUpdate pattern).
 	if existing != nil {
-		oldAccessor, err := meta.Accessor(existing)
-		if err == nil {
-			if accessor.GetUID() == "" {
-				accessor.SetUID(oldAccessor.GetUID())
-			}
-			ct := accessor.GetCreationTimestamp()
-			if ct.IsZero() {
-				accessor.SetCreationTimestamp(oldAccessor.GetCreationTimestamp())
-			}
+		if oldAccessor, accessErr := meta.Accessor(existing); accessErr == nil {
+			preserveObjectMetaFields(accessor, oldAccessor)
 		}
 	}
 

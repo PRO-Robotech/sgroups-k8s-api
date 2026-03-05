@@ -50,7 +50,7 @@ func AddressGroupFromProto(in *sgroupsv1.AddressGroup) *v1alpha1.AddressGroup {
 }
 
 //nolint:dupl // AddressGroupFromProto and AddressGroupFromProtoExt share structure but differ in input type
-func AddressGroupFromProtoExt(in *sgroupsv1.AddressGroupResp_List_AddressGroupExt) *v1alpha1.AddressGroup {
+func AddressGroupFromProtoExt(in *sgroupsv1.AddressGroupResp_AddressGroupExt) *v1alpha1.AddressGroup {
 	if in == nil {
 		return nil
 	}

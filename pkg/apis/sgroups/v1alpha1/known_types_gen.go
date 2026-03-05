@@ -9,6 +9,8 @@ func KnownTypes() []runtime.Object {
 	return []runtime.Object{
 		&AddressGroup{},
 		&AddressGroupList{},
+		&Network{},
+		&NetworkList{},
 		&Tenant{},
 		&TenantList{},
 	}

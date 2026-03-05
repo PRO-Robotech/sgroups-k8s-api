@@ -10,7 +10,7 @@ metadata:
   name: sgroups-k8s-apiserver
 rules:
   - apiGroups: ["sgroups.io"]
-    resources: ["tenants", "addressgroups"]
+    resources: ["tenants", "addressgroups", "networks"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   # Required by RecommendedOptions informers:
   - apiGroups: [""]
