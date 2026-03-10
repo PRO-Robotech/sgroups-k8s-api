@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Security Groups Kubernetes aggregated API. Provides Tenant and AddressGroup resources for managing network security group policies.",
+    "description": "Security Groups Kubernetes aggregated API. Provides Tenant, AddressGroup, and Network resources for managing network security group policies.",
     "title": "sgroups-k8s-api",
     "license": {
       "name": "Apache 2.0",
@@ -144,7 +144,7 @@
         "tags": [
           "sgroups_addressgroup"
         ],
-        "summary": "Create an AddressGroup",
+        "summary": "Create a AddressGroup",
         "operationId": "createNamespacedAddressGroup",
         "parameters": [
           {
@@ -188,7 +188,7 @@
         "tags": [
           "sgroups_addressgroup"
         ],
-        "summary": "Get an AddressGroup",
+        "summary": "Get a AddressGroup",
         "operationId": "getNamespacedAddressGroup",
         "responses": {
           "200": {
@@ -210,7 +210,7 @@
         "tags": [
           "sgroups_addressgroup"
         ],
-        "summary": "Update an AddressGroup",
+        "summary": "Update a AddressGroup",
         "operationId": "updateNamespacedAddressGroup",
         "parameters": [
           {
@@ -243,7 +243,7 @@
         "tags": [
           "sgroups_addressgroup"
         ],
-        "summary": "Delete an AddressGroup",
+        "summary": "Delete a AddressGroup",
         "operationId": "deleteNamespacedAddressGroup",
         "responses": {
           "200": {
@@ -265,7 +265,7 @@
         "tags": [
           "sgroups_addressgroup"
         ],
-        "summary": "Patch an AddressGroup",
+        "summary": "Patch a AddressGroup",
         "operationId": "patchNamespacedAddressGroup",
         "parameters": [
           {
@@ -303,6 +303,300 @@
           "required": true
         }
       ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/networks": {
+      "get": {
+        "description": "List Network resources in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "List Networks in a namespace",
+        "operationId": "listNamespacedNetwork",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkList"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new Network in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "Create a Network",
+        "operationId": "createNamespacedNetwork",
+        "parameters": [
+          {
+            "description": "Network to create",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the Network.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/networks/{name}": {
+      "get": {
+        "description": "Read the specified Network.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "Get a Network",
+        "operationId": "getNamespacedNetwork",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Replace the specified Network.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "Update a Network",
+        "operationId": "updateNamespacedNetwork",
+        "parameters": [
+          {
+            "description": "Updated Network",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the specified Network.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "Delete a Network",
+        "operationId": "deleteNamespacedNetwork",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Partially update the specified Network.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "Patch a Network",
+        "operationId": "patchNamespacedNetwork",
+        "parameters": [
+          {
+            "description": "Patch body",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Network"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the Network.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Name of the Network.",
+          "name": "name",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/networks": {
+      "get": {
+        "description": "List Network resources across all namespaces.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_network"
+        ],
+        "summary": "List Networks across all namespaces",
+        "operationId": "listNetworkForAllNamespaces",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkList"
+            }
+          }
+        }
+      }
     },
     "/apis/sgroups.io/v1alpha1/tenants": {
       "get": {
@@ -812,6 +1106,74 @@
         },
         "trace": {
           "type": "boolean"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network": {
+      "description": "Network represents a network resource.",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "spec": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkSpec"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkList": {
+      "description": "NetworkList is a list of Network resources.",
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+          }
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkSpec": {
+      "description": "NetworkSpec defines the desired state of a Network.",
+      "type": "object",
+      "properties": {
+        "CIDR": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
         }
       }
     },

@@ -14,6 +14,12 @@ const (
 
 	KindNetwork     = "Network"
 	KindNetworkList = "NetworkList"
+
+	KindHost     = "Host"
+	KindHostList = "HostList"
+
+	KindHostBinding     = "HostBinding"
+	KindHostBindingList = "HostBindingList"
 )
 
 // Resource plural name constants.
@@ -21,6 +27,8 @@ const (
 	ResourceTenants       = "tenants"
 	ResourceAddressGroups = "addressgroups"
 	ResourceNetworks      = "networks"
+	ResourceHosts         = "hosts"
+	ResourceHostBindings  = "hostbindings"
 )
 
 // Action represents the default action for an AddressGroup.
@@ -105,6 +113,60 @@ type NetworkList struct {
 	Items           []Network `json:"items"`
 }
 
+// ResourceIdentifier identifies a resource by name and namespace.
+type ResourceIdentifier struct {
+	Name      string `json:"name,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
+}
+
+// HostSpec defines the desired state of a Host.
+type HostSpec struct {
+	DisplayName string `json:"displayName,omitempty"`
+	Comment     string `json:"comment,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// Host represents a host resource.
+type Host struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              HostSpec `json:"spec,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// HostList is a list of Host resources.
+type HostList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Host `json:"items"`
+}
+
+// HostBindingSpec defines the desired state of a HostBinding.
+type HostBindingSpec struct {
+	DisplayName  string             `json:"displayName,omitempty"`
+	Comment      string             `json:"comment,omitempty"`
+	Description  string             `json:"description,omitempty"`
+	AddressGroup ResourceIdentifier `json:"addressGroup,omitempty"`
+	Host         ResourceIdentifier `json:"host,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// HostBinding represents a host binding resource.
+type HostBinding struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              HostBindingSpec `json:"spec,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// HostBindingList is a list of HostBinding resources.
+type HostBindingList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []HostBinding `json:"items"`
+}
+
 // ---------- OpenAPIModelName ----------
 // The Kubernetes DefinitionNamer converts Go import paths (slashes) to
 // dot-separated names. Types must implement OpenAPIModelName to match,
@@ -115,12 +177,19 @@ type NetworkList struct {
 // Exported for use by hack/openapi-spec.
 const OpenAPIPrefix = "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1."
 
-func (Tenant) OpenAPIModelName() string           { return OpenAPIPrefix + "Tenant" }
-func (TenantList) OpenAPIModelName() string       { return OpenAPIPrefix + "TenantList" }
-func (TenantSpec) OpenAPIModelName() string       { return OpenAPIPrefix + "TenantSpec" }
-func (AddressGroup) OpenAPIModelName() string     { return OpenAPIPrefix + "AddressGroup" }
-func (AddressGroupList) OpenAPIModelName() string { return OpenAPIPrefix + "AddressGroupList" }
-func (AddressGroupSpec) OpenAPIModelName() string { return OpenAPIPrefix + "AddressGroupSpec" }
-func (Network) OpenAPIModelName() string          { return OpenAPIPrefix + "Network" }
-func (NetworkList) OpenAPIModelName() string      { return OpenAPIPrefix + "NetworkList" }
-func (NetworkSpec) OpenAPIModelName() string      { return OpenAPIPrefix + "NetworkSpec" }
+func (Tenant) OpenAPIModelName() string             { return OpenAPIPrefix + "Tenant" }
+func (TenantList) OpenAPIModelName() string         { return OpenAPIPrefix + "TenantList" }
+func (TenantSpec) OpenAPIModelName() string         { return OpenAPIPrefix + "TenantSpec" }
+func (AddressGroup) OpenAPIModelName() string       { return OpenAPIPrefix + "AddressGroup" }
+func (AddressGroupList) OpenAPIModelName() string   { return OpenAPIPrefix + "AddressGroupList" }
+func (AddressGroupSpec) OpenAPIModelName() string   { return OpenAPIPrefix + "AddressGroupSpec" }
+func (Network) OpenAPIModelName() string            { return OpenAPIPrefix + "Network" }
+func (NetworkList) OpenAPIModelName() string        { return OpenAPIPrefix + "NetworkList" }
+func (NetworkSpec) OpenAPIModelName() string        { return OpenAPIPrefix + "NetworkSpec" }
+func (Host) OpenAPIModelName() string               { return OpenAPIPrefix + "Host" }
+func (HostList) OpenAPIModelName() string           { return OpenAPIPrefix + "HostList" }
+func (HostSpec) OpenAPIModelName() string           { return OpenAPIPrefix + "HostSpec" }
+func (HostBinding) OpenAPIModelName() string        { return OpenAPIPrefix + "HostBinding" }
+func (HostBindingList) OpenAPIModelName() string    { return OpenAPIPrefix + "HostBindingList" }
+func (HostBindingSpec) OpenAPIModelName() string    { return OpenAPIPrefix + "HostBindingSpec" }
+func (ResourceIdentifier) OpenAPIModelName() string { return OpenAPIPrefix + "ResourceIdentifier" }

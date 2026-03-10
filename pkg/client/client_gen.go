@@ -12,6 +12,8 @@ func newClient(conn *grpc.ClientConn) *Client {
 	return &Client{
 		Conn:          conn,
 		AddressGroups: sgroupsv1.NewSGroupsAddressGroupsAPIClient(conn),
+		HostBindings:  sgroupsv1.NewSGroupsHostBindingAPIClient(conn),
+		Hosts:         sgroupsv1.NewSGroupsHostsAPIClient(conn),
 		Networks:      sgroupsv1.NewSGroupsNetworksAPIClient(conn),
 		Namespaces:    sgroupsv1.NewSGroupsNamespaceAPIClient(conn),
 	}

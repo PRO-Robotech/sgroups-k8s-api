@@ -5,6 +5,8 @@ package apiserver
 import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"sgroups.io/sgroups-k8s-api/internal/registry/addressgroup"
+	"sgroups.io/sgroups-k8s-api/internal/registry/host"
+	"sgroups.io/sgroups-k8s-api/internal/registry/hostbinding"
 	"sgroups.io/sgroups-k8s-api/internal/registry/network"
 	registryoptions "sgroups.io/sgroups-k8s-api/internal/registry/options"
 	"sgroups.io/sgroups-k8s-api/internal/registry/tenant"
@@ -15,6 +17,8 @@ func buildStorageMap(grpcClient *client.Client, opts registryoptions.StorageOpti
 	return map[string]map[string]rest.Storage{
 		"v1alpha1": {
 			"addressgroups": addressgroup.NewStorage(grpcClient, opts),
+			"hostbindings":  hostbinding.NewStorage(grpcClient, opts),
+			"hosts":         host.NewStorage(grpcClient, opts),
 			"networks":      network.NewStorage(grpcClient, opts),
 			"tenants":       tenant.NewStorage(grpcClient, opts),
 		},
