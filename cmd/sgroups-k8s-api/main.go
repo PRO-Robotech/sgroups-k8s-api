@@ -25,7 +25,13 @@ func main() {
 		}
 	}
 
-	b := backend.Backend{Namespaces: mb, AddressGroups: mb}
+	b := backend.Backend{
+		Namespaces:    mb,
+		AddressGroups: mb,
+		Networks:      mb,
+		Hosts:         mb,
+		HostBindings:  mb,
+	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
