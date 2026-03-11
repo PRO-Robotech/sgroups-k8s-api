@@ -13,6 +13,8 @@ func KnownTypes() []runtime.Object {
 		&HostBindingList{},
 		&Host{},
 		&HostList{},
+		&NetworkBinding{},
+		&NetworkBindingList{},
 		&Network{},
 		&NetworkList{},
 		&Tenant{},

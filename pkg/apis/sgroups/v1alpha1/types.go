@@ -20,15 +20,19 @@ const (
 
 	KindHostBinding     = "HostBinding"
 	KindHostBindingList = "HostBindingList"
+
+	KindNetworkBinding     = "NetworkBinding"
+	KindNetworkBindingList = "NetworkBindingList"
 )
 
 // Resource plural name constants.
 const (
-	ResourceTenants       = "tenants"
-	ResourceAddressGroups = "addressgroups"
-	ResourceNetworks      = "networks"
-	ResourceHosts         = "hosts"
-	ResourceHostBindings  = "hostbindings"
+	ResourceTenants         = "tenants"
+	ResourceAddressGroups   = "addressgroups"
+	ResourceNetworks        = "networks"
+	ResourceHosts           = "hosts"
+	ResourceHostBindings    = "hostbindings"
+	ResourceNetworkBindings = "networkbindings"
 )
 
 // Action represents the default action for an AddressGroup.
@@ -167,6 +171,31 @@ type HostBindingList struct {
 	Items           []HostBinding `json:"items"`
 }
 
+// NetworkBindingSpec defines the desired state of a NetworkBinding.
+type NetworkBindingSpec struct {
+	DisplayName  string             `json:"displayName,omitempty"`
+	Comment      string             `json:"comment,omitempty"`
+	Description  string             `json:"description,omitempty"`
+	AddressGroup ResourceIdentifier `json:"addressGroup,omitempty"`
+	Network      ResourceIdentifier `json:"network,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// NetworkBinding represents a network binding resource.
+type NetworkBinding struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              NetworkBindingSpec `json:"spec,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// NetworkBindingList is a list of NetworkBinding resources.
+type NetworkBindingList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []NetworkBinding `json:"items"`
+}
+
 // ---------- OpenAPIModelName ----------
 // The Kubernetes DefinitionNamer converts Go import paths (slashes) to
 // dot-separated names. Types must implement OpenAPIModelName to match,
@@ -192,4 +221,7 @@ func (HostSpec) OpenAPIModelName() string           { return OpenAPIPrefix + "Ho
 func (HostBinding) OpenAPIModelName() string        { return OpenAPIPrefix + "HostBinding" }
 func (HostBindingList) OpenAPIModelName() string    { return OpenAPIPrefix + "HostBindingList" }
 func (HostBindingSpec) OpenAPIModelName() string    { return OpenAPIPrefix + "HostBindingSpec" }
+func (NetworkBinding) OpenAPIModelName() string     { return OpenAPIPrefix + "NetworkBinding" }
+func (NetworkBindingList) OpenAPIModelName() string { return OpenAPIPrefix + "NetworkBindingList" }
+func (NetworkBindingSpec) OpenAPIModelName() string { return OpenAPIPrefix + "NetworkBindingSpec" }
 func (ResourceIdentifier) OpenAPIModelName() string { return OpenAPIPrefix + "ResourceIdentifier" }

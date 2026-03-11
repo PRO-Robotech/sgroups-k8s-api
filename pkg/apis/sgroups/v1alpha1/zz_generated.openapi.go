@@ -96,6 +96,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		HostList{}.OpenAPIModelName():                     schema_pkg_apis_sgroups_v1alpha1_HostList(ref),
 		HostSpec{}.OpenAPIModelName():                     schema_pkg_apis_sgroups_v1alpha1_HostSpec(ref),
 		Network{}.OpenAPIModelName():                      schema_pkg_apis_sgroups_v1alpha1_Network(ref),
+		NetworkBinding{}.OpenAPIModelName():               schema_pkg_apis_sgroups_v1alpha1_NetworkBinding(ref),
+		NetworkBindingList{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_NetworkBindingList(ref),
+		NetworkBindingSpec{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_NetworkBindingSpec(ref),
 		NetworkList{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_NetworkList(ref),
 		NetworkSpec{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_NetworkSpec(ref),
 		ResourceIdentifier{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_ResourceIdentifier(ref),
@@ -3204,6 +3207,141 @@ func schema_pkg_apis_sgroups_v1alpha1_Network(ref common.ReferenceCallback) comm
 		},
 		Dependencies: []string{
 			v1.ObjectMeta{}.OpenAPIModelName(), NetworkSpec{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_NetworkBinding(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkBinding represents a network binding resource.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(NetworkBindingSpec{}.OpenAPIModelName()),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			v1.ObjectMeta{}.OpenAPIModelName(), NetworkBindingSpec{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_NetworkBindingList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkBindingList is a list of NetworkBinding resources.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(NetworkBinding{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), NetworkBinding{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_NetworkBindingSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkBindingSpec defines the desired state of a NetworkBinding.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"displayName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"comment": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"description": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"addressGroup": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(ResourceIdentifier{}.OpenAPIModelName()),
+						},
+					},
+					"network": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(ResourceIdentifier{}.OpenAPIModelName()),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			ResourceIdentifier{}.OpenAPIModelName()},
 	}
 }
 

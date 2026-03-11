@@ -7,12 +7,13 @@ import (
 )
 
 type Client struct {
-	Conn          *grpc.ClientConn
-	Namespaces    sgroupsv1.SGroupsNamespaceAPIClient
-	AddressGroups sgroupsv1.SGroupsAddressGroupsAPIClient
-	Networks      sgroupsv1.SGroupsNetworksAPIClient
-	Hosts         sgroupsv1.SGroupsHostsAPIClient
-	HostBindings  sgroupsv1.SGroupsHostBindingAPIClient
+	Conn            *grpc.ClientConn
+	Namespaces      sgroupsv1.SGroupsNamespaceAPIClient
+	AddressGroups   sgroupsv1.SGroupsAddressGroupsAPIClient
+	Networks        sgroupsv1.SGroupsNetworksAPIClient
+	Hosts           sgroupsv1.SGroupsHostsAPIClient
+	HostBindings    sgroupsv1.SGroupsHostBindingAPIClient
+	NetworkBindings sgroupsv1.SGroupsNetworkBindingAPIClient
 }
 
 func Dial(addr string, opts ...grpc.DialOption) (*Client, error) {

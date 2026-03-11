@@ -26,11 +26,12 @@ func main() {
 	}
 
 	b := backend.Backend{
-		Namespaces:    mb,
-		AddressGroups: mb,
-		Networks:      mb,
-		Hosts:         mb,
-		HostBindings:  mb,
+		Namespaces:      mb,
+		AddressGroups:   mb,
+		Networks:        mb,
+		Hosts:           mb,
+		HostBindings:    mb,
+		NetworkBindings: mb,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

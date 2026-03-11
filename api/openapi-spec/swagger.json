@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Security Groups Kubernetes aggregated API. Provides Tenant, AddressGroup, Network, Host, and HostBinding resources for managing network security group policies.",
+    "description": "Security Groups Kubernetes aggregated API.",
     "title": "sgroups-k8s-api",
     "license": {
       "name": "Apache 2.0",
@@ -892,6 +892,238 @@
         }
       ]
     },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/networkbindings": {
+      "get": {
+        "description": "List NetworkBinding resources in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "List NetworkBindings in a namespace",
+        "operationId": "listNamespacedNetworkBinding",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBindingList"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new NetworkBinding in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "Create a NetworkBinding",
+        "operationId": "createNamespacedNetworkBinding",
+        "parameters": [
+          {
+            "description": "NetworkBinding to create",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the NetworkBinding.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/networkbindings/{name}": {
+      "get": {
+        "description": "Read the specified NetworkBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "Get a NetworkBinding",
+        "operationId": "getNamespacedNetworkBinding",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Replace the specified NetworkBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "Update a NetworkBinding",
+        "operationId": "updateNamespacedNetworkBinding",
+        "parameters": [
+          {
+            "description": "Updated NetworkBinding",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the specified NetworkBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "Delete a NetworkBinding",
+        "operationId": "deleteNamespacedNetworkBinding",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Partially update the specified NetworkBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "Patch a NetworkBinding",
+        "operationId": "patchNamespacedNetworkBinding",
+        "parameters": [
+          {
+            "description": "Patch body",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBinding"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the NetworkBinding.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Name of the NetworkBinding.",
+          "name": "name",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/networks": {
       "get": {
         "description": "List Network resources in the specified namespace.",
@@ -1123,6 +1355,68 @@
           "required": true
         }
       ]
+    },
+    "/apis/sgroups.io/v1alpha1/networkbindings": {
+      "get": {
+        "description": "List NetworkBinding resources across all namespaces.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_networkbinding"
+        ],
+        "summary": "List NetworkBindings across all namespaces",
+        "operationId": "listNetworkBindingForAllNamespaces",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.NetworkBindingList"
+            }
+          }
+        }
+      }
     },
     "/apis/sgroups.io/v1alpha1/networks": {
       "get": {
@@ -1854,6 +2148,79 @@
         "spec": {
           "default": {},
           "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkSpec"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding": {
+      "description": "NetworkBinding represents a network binding resource.",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "spec": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingSpec"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingList": {
+      "description": "NetworkBindingList is a list of NetworkBinding resources.",
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+          }
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingSpec": {
+      "description": "NetworkBindingSpec defines the desired state of a NetworkBinding.",
+      "type": "object",
+      "properties": {
+        "addressGroup": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "network": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier"
         }
       }
     },

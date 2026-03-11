@@ -18,32 +18,36 @@ import (
 )
 
 type MockBackend struct {
-	mu            sync.RWMutex
-	version       int64
-	namespaces    map[string]*sgroupsv1.Namespace
-	addressGroups map[string]*sgroupsv1.AddressGroup
-	networks      map[string]*sgroupsv1.Network
-	hosts         map[string]*sgroupsv1.Host
-	hostBindings  map[string]*sgroupsv1.HostBinding
-	nsHub         *namespaceWatchHub
-	agHub         *addressGroupWatchHub
-	nwHub         *networkWatchHub
-	hostHub       *hostWatchHub
-	hbHub         *hostBindingWatchHub
+	mu              sync.RWMutex
+	version         int64
+	namespaces      map[string]*sgroupsv1.Namespace
+	addressGroups   map[string]*sgroupsv1.AddressGroup
+	networks        map[string]*sgroupsv1.Network
+	hosts           map[string]*sgroupsv1.Host
+	hostBindings    map[string]*sgroupsv1.HostBinding
+	networkBindings map[string]*sgroupsv1.NetworkBinding
+	nsHub           *namespaceWatchHub
+	agHub           *addressGroupWatchHub
+	nwHub           *networkWatchHub
+	hostHub         *hostWatchHub
+	hbHub           *hostBindingWatchHub
+	nbHub           *networkBindingWatchHub
 }
 
 func New() *MockBackend {
 	return &MockBackend{
-		namespaces:    make(map[string]*sgroupsv1.Namespace),
-		addressGroups: make(map[string]*sgroupsv1.AddressGroup),
-		networks:      make(map[string]*sgroupsv1.Network),
-		hosts:         make(map[string]*sgroupsv1.Host),
-		hostBindings:  make(map[string]*sgroupsv1.HostBinding),
-		nsHub:         newNamespaceWatchHub(),
-		agHub:         newAddressGroupWatchHub(),
-		nwHub:         newNetworkWatchHub(),
-		hostHub:       newHostWatchHub(),
-		hbHub:         newHostBindingWatchHub(),
+		namespaces:      make(map[string]*sgroupsv1.Namespace),
+		addressGroups:   make(map[string]*sgroupsv1.AddressGroup),
+		networks:        make(map[string]*sgroupsv1.Network),
+		hosts:           make(map[string]*sgroupsv1.Host),
+		hostBindings:    make(map[string]*sgroupsv1.HostBinding),
+		networkBindings: make(map[string]*sgroupsv1.NetworkBinding),
+		nsHub:           newNamespaceWatchHub(),
+		agHub:           newAddressGroupWatchHub(),
+		nwHub:           newNetworkWatchHub(),
+		hostHub:         newHostWatchHub(),
+		hbHub:           newHostBindingWatchHub(),
+		nbHub:           newNetworkBindingWatchHub(),
 	}
 }
 
@@ -651,6 +655,127 @@ func (m *MockBackend) WatchHostBindings(ctx context.Context, req *sgroupsv1.Host
 	}, nil
 }
 
+func (m *MockBackend) UpsertNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Upsert) (*sgroupsv1.NetworkBindingResp_Upsert, error) {
+	if req == nil || len(req.NetworkBindings) == 0 {
+		return nil, errors.New("network bindings are required")
+	}
+	m.mu.Lock()
+	added := make([]*sgroupsv1.NetworkBinding, 0, len(req.NetworkBindings))
+	modified := make([]*sgroupsv1.NetworkBinding, 0, len(req.NetworkBindings))
+	resp := &sgroupsv1.NetworkBindingResp_Upsert{NetworkBindings: make([]*sgroupsv1.NetworkBinding, 0, len(req.NetworkBindings))}
+	for _, nb := range req.NetworkBindings {
+		if nb == nil || nb.Metadata == nil {
+			m.mu.Unlock()
+
+			return nil, errors.New("network binding metadata is required")
+		}
+		stored, isNew := m.upsertNetworkBindingLocked(nb)
+		resp.NetworkBindings = append(resp.NetworkBindings, cloneNetworkBinding(stored))
+		if isNew {
+			added = append(added, cloneNetworkBinding(stored))
+		} else {
+			modified = append(modified, cloneNetworkBinding(stored))
+		}
+	}
+	m.mu.Unlock()
+
+	if len(added) > 0 {
+		m.nbHub.publish(&sgroupsv1.NetworkBindingResp_Watch{Type: commonpb.WatchEventType_ADDED, NetworkBindings: added})
+	}
+	if len(modified) > 0 {
+		m.nbHub.publish(&sgroupsv1.NetworkBindingResp_Watch{Type: commonpb.WatchEventType_MODIFIED, NetworkBindings: modified})
+	}
+
+	return resp, nil
+}
+
+func (m *MockBackend) DeleteNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Delete) error {
+	if req == nil || len(req.NetworkBindings) == 0 {
+		return errors.New("network bindings are required")
+	}
+	m.mu.Lock()
+	deleted := make([]*sgroupsv1.NetworkBinding, 0, len(req.NetworkBindings))
+	for _, nb := range req.NetworkBindings {
+		if nb == nil || nb.Metadata == nil {
+			m.mu.Unlock()
+
+			return errors.New("network binding delete metadata is required")
+		}
+		uid := nb.Metadata.Uid
+		name := nb.Metadata.Name
+		ns := nb.Metadata.Namespace
+		if uid == "" && (name == "" || ns == "") {
+			m.mu.Unlock()
+
+			return errors.New("network binding delete requires uid or name+namespace")
+		}
+		if uid != "" {
+			if stored, ok := m.networkBindings[uid]; ok {
+				delete(m.networkBindings, uid)
+				deleted = append(deleted, cloneNetworkBinding(stored))
+			}
+
+			continue
+		}
+		for id, stored := range m.networkBindings {
+			if stored.Metadata != nil && stored.Metadata.Name == name && stored.Metadata.Namespace == ns {
+				delete(m.networkBindings, id)
+				deleted = append(deleted, cloneNetworkBinding(stored))
+
+				break
+			}
+		}
+	}
+	m.mu.Unlock()
+
+	if len(deleted) > 0 {
+		m.nbHub.publish(&sgroupsv1.NetworkBindingResp_Watch{Type: commonpb.WatchEventType_DELETED, NetworkBindings: deleted})
+	}
+
+	return nil
+}
+
+func (m *MockBackend) ListNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_List) (*sgroupsv1.NetworkBindingResp_List, error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, errors.New("selectors are required")
+	}
+	m.mu.RLock()
+	items := make([]*sgroupsv1.NetworkBinding, 0, len(m.networkBindings))
+	for _, nb := range m.networkBindings {
+		items = append(items, nb)
+	}
+	m.mu.RUnlock()
+
+	filtered := filterNetworkBindings(req.Selectors, items)
+
+	return &sgroupsv1.NetworkBindingResp_List{
+		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		NetworkBindings: filtered,
+	}, nil
+}
+
+func (m *MockBackend) WatchNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Watch) (backend.WatchStream[*sgroupsv1.NetworkBindingResp_Watch], error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return backend.WatchStream[*sgroupsv1.NetworkBindingResp_Watch]{}, errors.New("selectors are required")
+	}
+	ch, cancel := m.nbHub.subscribe(req.Selectors, 16)
+
+	m.mu.RLock()
+	items := make([]*sgroupsv1.NetworkBinding, 0, len(m.networkBindings))
+	for _, nb := range m.networkBindings {
+		items = append(items, nb)
+	}
+	m.mu.RUnlock()
+
+	snapshot := filterNetworkBindings(req.Selectors, items)
+	ch <- &sgroupsv1.NetworkBindingResp_Watch{Type: commonpb.WatchEventType_ADDED, NetworkBindings: snapshot}
+
+	return backend.WatchStream[*sgroupsv1.NetworkBindingResp_Watch]{
+		C:     ch,
+		Close: cancel,
+	}, nil
+}
+
 func (m *MockBackend) upsertNamespaceLocked(ns *sgroupsv1.Namespace) (*sgroupsv1.Namespace, bool) {
 	clone := cloneNamespace(ns)
 	uid := clone.Metadata.Uid
@@ -723,6 +848,25 @@ func (m *MockBackend) upsertHostBindingLocked(hb *sgroupsv1.HostBinding) (*sgrou
 	}
 	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
 	m.hostBindings[uid] = clone
+
+	return clone, !ok
+}
+
+func (m *MockBackend) upsertNetworkBindingLocked(nb *sgroupsv1.NetworkBinding) (*sgroupsv1.NetworkBinding, bool) {
+	clone := cloneNetworkBinding(nb)
+	uid := clone.Metadata.Uid
+	if uid == "" {
+		uid = uuid.NewString()
+		clone.Metadata.Uid = uid
+	}
+	existing, ok := m.networkBindings[uid]
+	if ok && existing != nil && existing.Metadata != nil {
+		clone.Metadata.CreationTimestamp = existing.Metadata.CreationTimestamp
+	} else if clone.Metadata.CreationTimestamp == nil {
+		clone.Metadata.CreationTimestamp = timestamppb.Now()
+	}
+	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	m.networkBindings[uid] = clone
 
 	return clone, !ok
 }
@@ -829,6 +973,14 @@ func cloneHostBinding(hb *sgroupsv1.HostBinding) *sgroupsv1.HostBinding {
 	}
 
 	return proto.Clone(hb).(*sgroupsv1.HostBinding) //nolint:forcetypeassert,errcheck // proto.Clone preserves concrete type
+}
+
+func cloneNetworkBinding(nb *sgroupsv1.NetworkBinding) *sgroupsv1.NetworkBinding {
+	if nb == nil {
+		return nil
+	}
+
+	return proto.Clone(nb).(*sgroupsv1.NetworkBinding) //nolint:forcetypeassert,errcheck // proto.Clone preserves concrete type
 }
 
 func toHostExtList(items []*sgroupsv1.Host) []*sgroupsv1.HostResp_HostExt {
@@ -1000,6 +1152,81 @@ func matchHostBindingSelector(hb *sgroupsv1.HostBinding, sel *sgroupsv1.HostBind
 	}
 	if len(sel.LabelSelector) > 0 {
 		if !matchLabels(hb.Metadata.Labels, sel.LabelSelector) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func filterNetworkBindings(selectors []*sgroupsv1.NetworkBindingReq_Selectors, items []*sgroupsv1.NetworkBinding) []*sgroupsv1.NetworkBinding {
+	if len(selectors) == 0 {
+		return nil
+	}
+	result := make([]*sgroupsv1.NetworkBinding, 0)
+	for _, nb := range items {
+		if nb == nil || nb.Metadata == nil {
+			continue
+		}
+		if matchNetworkBindingSelectors(nb, selectors) {
+			result = append(result, cloneNetworkBinding(nb))
+		}
+	}
+
+	return result
+}
+
+func matchNetworkBindingSelectors(nb *sgroupsv1.NetworkBinding, selectors []*sgroupsv1.NetworkBindingReq_Selectors) bool {
+	for _, sel := range selectors {
+		if sel == nil {
+			continue
+		}
+		if matchNetworkBindingSelector(nb, sel) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func matchNetworkBindingSelector(nb *sgroupsv1.NetworkBinding, sel *sgroupsv1.NetworkBindingReq_Selectors) bool {
+	if sel == nil {
+		return false
+	}
+	if fs := sel.FieldSelector; fs != nil {
+		if fs.Name != "" && nb.Metadata.Name != fs.Name {
+			return false
+		}
+		if fs.Namespace != "" && nb.Metadata.Namespace != fs.Namespace {
+			return false
+		}
+		if fs.AddressGroup != nil {
+			ag := nb.GetSpec().GetAddressGroup()
+			if ag == nil {
+				return false
+			}
+			if fs.AddressGroup.Name != "" && ag.Name != fs.AddressGroup.Name {
+				return false
+			}
+			if fs.AddressGroup.Namespace != "" && ag.Namespace != fs.AddressGroup.Namespace {
+				return false
+			}
+		}
+		if fs.Network != nil {
+			nw := nb.GetSpec().GetNetwork()
+			if nw == nil {
+				return false
+			}
+			if fs.Network.Name != "" && nw.Name != fs.Network.Name {
+				return false
+			}
+			if fs.Network.Namespace != "" && nw.Namespace != fs.Network.Namespace {
+				return false
+			}
+		}
+	}
+	if len(sel.LabelSelector) > 0 {
+		if !matchLabels(nb.Metadata.Labels, sel.LabelSelector) {
 			return false
 		}
 	}
@@ -1500,6 +1727,63 @@ func (h *hostBindingWatchHub) publish(event *sgroupsv1.HostBindingResp_Watch) {
 			continue
 		}
 		resp := &sgroupsv1.HostBindingResp_Watch{Type: event.Type, HostBindings: filtered}
+		select {
+		case sub.ch <- resp:
+		default:
+		}
+	}
+}
+
+type networkBindingWatchHub struct {
+	mu     sync.Mutex
+	nextID int64
+	subs   map[int64]*networkBindingWatchSub
+}
+
+type networkBindingWatchSub struct {
+	selectors []*sgroupsv1.NetworkBindingReq_Selectors
+	ch        chan *sgroupsv1.NetworkBindingResp_Watch
+}
+
+func newNetworkBindingWatchHub() *networkBindingWatchHub {
+	return &networkBindingWatchHub{subs: make(map[int64]*networkBindingWatchSub)}
+}
+
+func (h *networkBindingWatchHub) subscribe(selectors []*sgroupsv1.NetworkBindingReq_Selectors, buffer int) (chan *sgroupsv1.NetworkBindingResp_Watch, func()) {
+	if buffer <= 0 {
+		buffer = 1
+	}
+	h.mu.Lock()
+	h.nextID++
+	id := h.nextID
+	ch := make(chan *sgroupsv1.NetworkBindingResp_Watch, buffer)
+	h.subs[id] = &networkBindingWatchSub{selectors: selectors, ch: ch}
+	h.mu.Unlock()
+
+	return ch, func() {
+		h.mu.Lock()
+		delete(h.subs, id)
+		h.mu.Unlock()
+	}
+}
+
+func (h *networkBindingWatchHub) publish(event *sgroupsv1.NetworkBindingResp_Watch) {
+	if event == nil {
+		return
+	}
+	h.mu.Lock()
+	subs := make([]*networkBindingWatchSub, 0, len(h.subs))
+	for _, sub := range h.subs {
+		subs = append(subs, sub)
+	}
+	h.mu.Unlock()
+
+	for _, sub := range subs {
+		filtered := filterNetworkBindings(sub.selectors, event.NetworkBindings)
+		if len(filtered) == 0 {
+			continue
+		}
+		resp := &sgroupsv1.NetworkBindingResp_Watch{Type: event.Type, NetworkBindings: filtered}
 		select {
 		case sub.ch <- resp:
 		default:

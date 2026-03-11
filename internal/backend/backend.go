@@ -46,10 +46,18 @@ type HostBindingBackend interface {
 	WatchHostBindings(ctx context.Context, req *sgroupsv1.HostBindingReq_Watch) (WatchStream[*sgroupsv1.HostBindingResp_Watch], error)
 }
 
+type NetworkBindingBackend interface {
+	UpsertNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Upsert) (*sgroupsv1.NetworkBindingResp_Upsert, error)
+	DeleteNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Delete) error
+	ListNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_List) (*sgroupsv1.NetworkBindingResp_List, error)
+	WatchNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Watch) (WatchStream[*sgroupsv1.NetworkBindingResp_Watch], error)
+}
+
 type Backend struct {
-	Namespaces    NamespaceBackend
-	AddressGroups AddressGroupBackend
-	Networks      NetworkBackend
-	Hosts         HostBackend
-	HostBindings  HostBindingBackend
+	Namespaces      NamespaceBackend
+	AddressGroups   AddressGroupBackend
+	Networks        NetworkBackend
+	Hosts           HostBackend
+	HostBindings    HostBindingBackend
+	NetworkBindings NetworkBindingBackend
 }
