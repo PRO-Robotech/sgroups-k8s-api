@@ -10,6 +10,7 @@ type Client struct {
 	Conn          *grpc.ClientConn
 	Namespaces    sgroupsv1.SGroupsNamespaceAPIClient
 	AddressGroups sgroupsv1.SGroupsAddressGroupsAPIClient
+	Networks      sgroupsv1.SGroupsNetworksAPIClient
 }
 
 func Dial(addr string, opts ...grpc.DialOption) (*Client, error) {

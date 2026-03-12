@@ -100,6 +100,20 @@ spec:
 			expectedNamespace: "default",
 		},
 		{
+			name: "network",
+			manifest: `apiVersion: sgroups.io/v1alpha1
+kind: Network
+metadata:
+  name: nw-1
+  namespace: default
+spec:
+  CIDR: 10.0.0.0/24
+`,
+			getArgs:           []string{"-n", "default", "networks.sgroups.io", "nw-1"},
+			expectedName:      "nw-1",
+			expectedNamespace: "default",
+		},
+		{
 			name: "tenant",
 			manifest: `apiVersion: sgroups.io/v1alpha1
 kind: Tenant
@@ -141,7 +155,7 @@ func startMockGRPCBackend(t *testing.T) (string, func()) {
 
 	grpcServer := grpc.NewServer()
 	mb := mock.New()
-	b := backend.Backend{Namespaces: mb, AddressGroups: mb}
+	b := backend.Backend{Namespaces: mb, AddressGroups: mb, Networks: mb}
 	mock.RegisterServices(grpcServer, b)
 
 	go func() {

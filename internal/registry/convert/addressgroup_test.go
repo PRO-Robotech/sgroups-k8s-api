@@ -133,7 +133,7 @@ func TestAddressGroupConversion(t *testing.T) {
 func TestAddressGroupFromProtoExt(t *testing.T) {
 	ts := time.Date(2025, 3, 10, 8, 0, 0, 0, time.UTC)
 
-	ext := &sgroupsv1.AddressGroupResp_List_AddressGroupExt{
+	ext := &sgroupsv1.AddressGroupResp_AddressGroupExt{
 		Metadata: &commonpb.Metadata{
 			Uid:               "ext-uid",
 			Name:              "ag-ext",

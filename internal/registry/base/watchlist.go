@@ -34,6 +34,7 @@ func NewWatchListWatch(
 		stopCh:   make(chan struct{}),
 	}
 	go w.run(initialItems, newObj, listRV)
+
 	return w
 }
 
@@ -57,15 +58,27 @@ func (w *WatchListWatch) run(
 ) {
 	defer close(w.resultCh)
 
+	if !w.sendInitialAddedEvents(initialItems) {
+		return
+	}
+	if !w.sendInitialBookmark(newObj, listRV) {
+		return
+	}
+	w.forwardInnerEvents()
+}
+
+func (w *WatchListWatch) sendInitialAddedEvents(initialItems []runtime.Object) bool {
 	// Phase 1: Send initial items as ADDED events.
 	for _, item := range initialItems {
-		select {
-		case w.resultCh <- watch.Event{Type: watch.Added, Object: item}:
-		case <-w.stopCh:
-			return
+		if !w.sendEvent(watch.Event{Type: watch.Added, Object: item}) {
+			return false
 		}
 	}
 
+	return true
+}
+
+func (w *WatchListWatch) sendInitialBookmark(newObj func() runtime.Object, listRV string) bool {
 	// Phase 2: Send BOOKMARK with initial-events-end annotation.
 	bookmark := newObj()
 	if a, err := meta.Accessor(bookmark); err == nil {
@@ -74,12 +87,11 @@ func (w *WatchListWatch) run(
 			metav1.InitialEventsAnnotationKey: "true",
 		})
 	}
-	select {
-	case w.resultCh <- watch.Event{Type: watch.Bookmark, Object: bookmark}:
-	case <-w.stopCh:
-		return
-	}
 
+	return w.sendEvent(watch.Event{Type: watch.Bookmark, Object: bookmark})
+}
+
+func (w *WatchListWatch) forwardInnerEvents() {
 	// Phase 3: Forward live events from inner watch.
 	innerCh := w.inner.ResultChan()
 	for {
@@ -90,11 +102,18 @@ func (w *WatchListWatch) run(
 			if !ok {
 				return
 			}
-			select {
-			case w.resultCh <- evt:
-			case <-w.stopCh:
+			if !w.sendEvent(evt) {
 				return
 			}
 		}
+	}
+}
+
+func (w *WatchListWatch) sendEvent(evt watch.Event) bool {
+	select {
+	case w.resultCh <- evt:
+		return true
+	case <-w.stopCh:
+		return false
 	}
 }

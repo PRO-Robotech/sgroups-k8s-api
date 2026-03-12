@@ -25,7 +25,15 @@ type AddressGroupBackend interface {
 	WatchAddressGroups(ctx context.Context, req *sgroupsv1.AddressGroupReq_Watch) (WatchStream[*sgroupsv1.AddressGroupResp_Watch], error)
 }
 
+type NetworkBackend interface {
+	UpsertNetworks(ctx context.Context, req *sgroupsv1.NetworkReq_Upsert) (*sgroupsv1.NetworkResp_Upsert, error)
+	DeleteNetworks(ctx context.Context, req *sgroupsv1.NetworkReq_Delete) error
+	ListNetworks(ctx context.Context, req *sgroupsv1.NetworkReq_List) (*sgroupsv1.NetworkResp_List, error)
+	WatchNetworks(ctx context.Context, req *sgroupsv1.NetworkReq_Watch) (WatchStream[*sgroupsv1.NetworkResp_Watch], error)
+}
+
 type Backend struct {
 	Namespaces    NamespaceBackend
 	AddressGroups AddressGroupBackend
+	Networks      NetworkBackend
 }
