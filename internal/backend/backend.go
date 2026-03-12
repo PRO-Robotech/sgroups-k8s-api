@@ -32,8 +32,32 @@ type NetworkBackend interface {
 	WatchNetworks(ctx context.Context, req *sgroupsv1.NetworkReq_Watch) (WatchStream[*sgroupsv1.NetworkResp_Watch], error)
 }
 
+type HostBackend interface {
+	UpsertHosts(ctx context.Context, req *sgroupsv1.HostReq_Upsert) (*sgroupsv1.HostResp_Upsert, error)
+	DeleteHosts(ctx context.Context, req *sgroupsv1.HostReq_Delete) error
+	ListHosts(ctx context.Context, req *sgroupsv1.HostReq_List) (*sgroupsv1.HostResp_List, error)
+	WatchHosts(ctx context.Context, req *sgroupsv1.HostReq_Watch) (WatchStream[*sgroupsv1.HostResp_Watch], error)
+}
+
+type HostBindingBackend interface {
+	UpsertHostBindings(ctx context.Context, req *sgroupsv1.HostBindingReq_Upsert) (*sgroupsv1.HostBindingResp_Upsert, error)
+	DeleteHostBindings(ctx context.Context, req *sgroupsv1.HostBindingReq_Delete) error
+	ListHostBindings(ctx context.Context, req *sgroupsv1.HostBindingReq_List) (*sgroupsv1.HostBindingResp_List, error)
+	WatchHostBindings(ctx context.Context, req *sgroupsv1.HostBindingReq_Watch) (WatchStream[*sgroupsv1.HostBindingResp_Watch], error)
+}
+
+type NetworkBindingBackend interface {
+	UpsertNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Upsert) (*sgroupsv1.NetworkBindingResp_Upsert, error)
+	DeleteNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Delete) error
+	ListNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_List) (*sgroupsv1.NetworkBindingResp_List, error)
+	WatchNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Watch) (WatchStream[*sgroupsv1.NetworkBindingResp_Watch], error)
+}
+
 type Backend struct {
-	Namespaces    NamespaceBackend
-	AddressGroups AddressGroupBackend
-	Networks      NetworkBackend
+	Namespaces      NamespaceBackend
+	AddressGroups   AddressGroupBackend
+	Networks        NetworkBackend
+	Hosts           HostBackend
+	HostBindings    HostBindingBackend
+	NetworkBindings NetworkBindingBackend
 }
