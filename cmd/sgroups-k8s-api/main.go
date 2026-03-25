@@ -32,6 +32,9 @@ func main() {
 		Hosts:           mb,
 		HostBindings:    mb,
 		NetworkBindings: mb,
+		Services:        mb,
+		ServiceBindings: mb,
+		Rules:           mb,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

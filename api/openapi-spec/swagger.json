@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Security Groups Kubernetes aggregated API.",
+    "description": "Security Groups Kubernetes aggregated API. Provides Tenant, AddressGroup, Network, Host, HostBinding, NetworkBinding, Service, ServiceBinding, and Rule resources for managing network security group policies.",
     "title": "sgroups-k8s-api",
     "license": {
       "name": "Apache 2.0",
@@ -1356,6 +1356,470 @@
         }
       ]
     },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/servicebindings": {
+      "get": {
+        "description": "List ServiceBinding resources in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "List ServiceBindings in a namespace",
+        "operationId": "listNamespacedServiceBinding",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBindingList"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new ServiceBinding in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "Create a ServiceBinding",
+        "operationId": "createNamespacedServiceBinding",
+        "parameters": [
+          {
+            "description": "ServiceBinding to create",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the ServiceBinding.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/servicebindings/{name}": {
+      "get": {
+        "description": "Read the specified ServiceBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "Get a ServiceBinding",
+        "operationId": "getNamespacedServiceBinding",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Replace the specified ServiceBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "Update a ServiceBinding",
+        "operationId": "updateNamespacedServiceBinding",
+        "parameters": [
+          {
+            "description": "Updated ServiceBinding",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the specified ServiceBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "Delete a ServiceBinding",
+        "operationId": "deleteNamespacedServiceBinding",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Partially update the specified ServiceBinding.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "Patch a ServiceBinding",
+        "operationId": "patchNamespacedServiceBinding",
+        "parameters": [
+          {
+            "description": "Patch body",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBinding"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the ServiceBinding.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Name of the ServiceBinding.",
+          "name": "name",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/services": {
+      "get": {
+        "description": "List Service resources in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "List Services in a namespace",
+        "operationId": "listNamespacedService",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceList"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new Service in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "Create a Service",
+        "operationId": "createNamespacedService",
+        "parameters": [
+          {
+            "description": "Service to create",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the Service.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/services/{name}": {
+      "get": {
+        "description": "Read the specified Service.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "Get a Service",
+        "operationId": "getNamespacedService",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Replace the specified Service.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "Update a Service",
+        "operationId": "updateNamespacedService",
+        "parameters": [
+          {
+            "description": "Updated Service",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the specified Service.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "Delete a Service",
+        "operationId": "deleteNamespacedService",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Partially update the specified Service.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "Patch a Service",
+        "operationId": "patchNamespacedService",
+        "parameters": [
+          {
+            "description": "Patch body",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Service"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the Service.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Name of the Service.",
+          "name": "name",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/apis/sgroups.io/v1alpha1/networkbindings": {
       "get": {
         "description": "List NetworkBinding resources across all namespaces.",
@@ -1475,6 +1939,130 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/v1alpha1.NetworkList"
+            }
+          }
+        }
+      }
+    },
+    "/apis/sgroups.io/v1alpha1/servicebindings": {
+      "get": {
+        "description": "List ServiceBinding resources across all namespaces.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_servicebinding"
+        ],
+        "summary": "List ServiceBindings across all namespaces",
+        "operationId": "listServiceBindingForAllNamespaces",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceBindingList"
+            }
+          }
+        }
+      }
+    },
+    "/apis/sgroups.io/v1alpha1/services": {
+      "get": {
+        "description": "List Service resources across all namespaces.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_service"
+        ],
+        "summary": "List Services across all namespaces",
+        "operationId": "listServiceForAllNamespaces",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.ServiceList"
             }
           }
         }
@@ -2279,6 +2867,193 @@
         },
         "namespace": {
           "type": "string"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service": {
+      "description": "Service represents a service resource.",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "spec": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceSpec"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding": {
+      "description": "ServiceBinding represents a service binding resource.",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "spec": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingSpec"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingList": {
+      "description": "ServiceBindingList is a list of ServiceBinding resources.",
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+          }
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingSpec": {
+      "description": "ServiceBindingSpec defines the desired state of a ServiceBinding.",
+      "type": "object",
+      "properties": {
+        "addressGroup": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "service": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceList": {
+      "description": "ServiceList is a list of Service resources.",
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+          }
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceSpec": {
+      "description": "ServiceSpec defines the desired state of a Service.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "transports": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceTransport"
+          }
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceTransport": {
+      "description": "ServiceTransport represents network transport configuration for a service.",
+      "type": "object",
+      "properties": {
+        "IPv": {
+          "type": "string"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceTransportEntry"
+          }
+        },
+        "protocol": {
+          "type": "string"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceTransportEntry": {
+      "description": "ServiceTransportEntry represents a transport entry (ports or ICMP types) for a service.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "ports": {
+          "type": "string"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0
+          }
         }
       }
     },

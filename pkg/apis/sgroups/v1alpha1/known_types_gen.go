@@ -17,6 +17,12 @@ func KnownTypes() []runtime.Object {
 		&NetworkBindingList{},
 		&Network{},
 		&NetworkList{},
+		&Rule{},
+		&RuleList{},
+		&ServiceBinding{},
+		&ServiceBindingList{},
+		&Service{},
+		&ServiceList{},
 		&Tenant{},
 		&TenantList{},
 	}
