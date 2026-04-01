@@ -102,6 +102,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		NetworkList{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_NetworkList(ref),
 		NetworkSpec{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_NetworkSpec(ref),
 		ResourceIdentifier{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_ResourceIdentifier(ref),
+		ResourceRef{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_ResourceRef(ref),
 		Rule{}.OpenAPIModelName():                         schema_pkg_apis_sgroups_v1alpha1_Rule(ref),
 		RuleEndpoint{}.OpenAPIModelName():                 schema_pkg_apis_sgroups_v1alpha1_RuleEndpoint(ref),
 		RuleEndpoints{}.OpenAPIModelName():                schema_pkg_apis_sgroups_v1alpha1_RuleEndpoints(ref),
@@ -2823,11 +2824,24 @@ func schema_pkg_apis_sgroups_v1alpha1_AddressGroup(ref common.ReferenceCallback)
 							Ref:     ref(AddressGroupSpec{}.OpenAPIModelName()),
 						},
 					},
+					"refs": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(ResourceRef{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), AddressGroupSpec{}.OpenAPIModelName()},
+			v1.ObjectMeta{}.OpenAPIModelName(), AddressGroupSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -2962,11 +2976,24 @@ func schema_pkg_apis_sgroups_v1alpha1_Host(ref common.ReferenceCallback) common.
 							Ref:     ref(HostSpec{}.OpenAPIModelName()),
 						},
 					},
+					"refs": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(ResourceRef{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), HostSpec{}.OpenAPIModelName()},
+			v1.ObjectMeta{}.OpenAPIModelName(), HostSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -3218,11 +3245,24 @@ func schema_pkg_apis_sgroups_v1alpha1_Network(ref common.ReferenceCallback) comm
 							Ref:     ref(NetworkSpec{}.OpenAPIModelName()),
 						},
 					},
+					"refs": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(ResourceRef{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), NetworkSpec{}.OpenAPIModelName()},
+			v1.ObjectMeta{}.OpenAPIModelName(), NetworkSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -3461,6 +3501,37 @@ func schema_pkg_apis_sgroups_v1alpha1_ResourceIdentifier(ref common.ReferenceCal
 						},
 					},
 					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_ResourceRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ResourceRef represents a read-only reference to a related resource.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"resType": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -3785,11 +3856,24 @@ func schema_pkg_apis_sgroups_v1alpha1_Service(ref common.ReferenceCallback) comm
 							Ref:     ref(ServiceSpec{}.OpenAPIModelName()),
 						},
 					},
+					"refs": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(ResourceRef{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), ServiceSpec{}.OpenAPIModelName()},
+			v1.ObjectMeta{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName(), ServiceSpec{}.OpenAPIModelName()},
 	}
 }
 

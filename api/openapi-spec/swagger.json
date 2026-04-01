@@ -1356,6 +1356,238 @@
         }
       ]
     },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/rules": {
+      "get": {
+        "description": "List Rule resources in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "List Rules in a namespace",
+        "operationId": "listNamespacedRule",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.RuleList"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new Rule in the specified namespace.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "Create a Rule",
+        "operationId": "createNamespacedRule",
+        "parameters": [
+          {
+            "description": "Rule to create",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the Rule.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/rules/{name}": {
+      "get": {
+        "description": "Read the specified Rule.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "Get a Rule",
+        "operationId": "getNamespacedRule",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Replace the specified Rule.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "Update a Rule",
+        "operationId": "updateNamespacedRule",
+        "parameters": [
+          {
+            "description": "Updated Rule",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the specified Rule.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "Delete a Rule",
+        "operationId": "deleteNamespacedRule",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1.Status"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Partially update the specified Rule.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "Patch a Rule",
+        "operationId": "patchNamespacedRule",
+        "parameters": [
+          {
+            "description": "Patch body",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.Rule"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "description": "Namespace of the Rule.",
+          "name": "namespace",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Name of the Rule.",
+          "name": "name",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/servicebindings": {
       "get": {
         "description": "List ServiceBinding resources in the specified namespace.",
@@ -1944,6 +2176,68 @@
         }
       }
     },
+    "/apis/sgroups.io/v1alpha1/rules": {
+      "get": {
+        "description": "List Rule resources across all namespaces.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "sgroups_rule"
+        ],
+        "summary": "List Rules across all namespaces",
+        "operationId": "listRuleForAllNamespaces",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Watch for changes.",
+            "name": "watch",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Label selector for filtering.",
+            "name": "labelSelector",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Field selector for filtering.",
+            "name": "fieldSelector",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Maximum number of results.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Continue token for pagination.",
+            "name": "continue",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Minimum resource version.",
+            "name": "resourceVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/v1alpha1.RuleList"
+            }
+          }
+        }
+      }
+    },
     "/apis/sgroups.io/v1alpha1/servicebindings": {
       "get": {
         "description": "List ServiceBinding resources across all namespaces.",
@@ -2491,10 +2785,9 @@
       "format": "date-time"
     },
     "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Action": {
-      "description": "AddressGroup default action (ALLOW or DENY)",
+      "description": "Action (ALLOW or DENY)",
       "type": "string",
       "enum": [
-        "UNKNOWN",
         "ALLOW",
         "DENY"
       ]
@@ -2514,6 +2807,13 @@
         "metadata": {
           "default": {},
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceRef"
+          }
         },
         "spec": {
           "default": {},
@@ -2557,10 +2857,8 @@
           "type": "string"
         },
         "defaultAction": {
-          "description": "Default action for the address group (ALLOW or DENY)",
           "type": "string",
           "enum": [
-            "UNKNOWN",
             "ALLOW",
             "DENY"
           ]
@@ -2579,6 +2877,16 @@
         }
       }
     },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.EndpointType": {
+      "description": "Endpoint type (ADDRESS_GROUP, SERVICE, FQDN, or CIDR)",
+      "type": "string",
+      "enum": [
+        "ADDRESS_GROUP",
+        "SERVICE",
+        "FQDN",
+        "CIDR"
+      ]
+    },
     "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host": {
       "description": "Host represents a host resource.",
       "type": "object",
@@ -2594,6 +2902,13 @@
         "metadata": {
           "default": {},
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceRef"
+          }
         },
         "spec": {
           "default": {},
@@ -2717,6 +3032,14 @@
         }
       }
     },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.IpAddrFamily": {
+      "description": "IP address family (IPv4 or IPv6)",
+      "type": "string",
+      "enum": [
+        "IPv4",
+        "IPv6"
+      ]
+    },
     "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network": {
       "description": "Network represents a network resource.",
       "type": "object",
@@ -2732,6 +3055,13 @@
         "metadata": {
           "default": {},
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceRef"
+          }
         },
         "spec": {
           "default": {},
@@ -2858,6 +3188,15 @@
         }
       }
     },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Protocol": {
+      "description": "Network transport protocol (TCP, UDP, or ICMP)",
+      "type": "string",
+      "enum": [
+        "TCP",
+        "UDP",
+        "ICMP"
+      ]
+    },
     "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier": {
       "description": "ResourceIdentifier identifies a resource by name and namespace.",
       "type": "object",
@@ -2867,6 +3206,187 @@
         },
         "namespace": {
           "type": "string"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceRef": {
+      "description": "ResourceRef represents a read-only reference to a related resource.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "resType": {
+          "type": "string"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule": {
+      "description": "Rule represents a rule resource.",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "spec": {
+          "default": {},
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleSpec"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleEndpoint": {
+      "description": "RuleEndpoint represents a local or remote endpoint.",
+      "type": "object",
+      "properties": {
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "default": ""
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ADDRESS_GROUP",
+            "SERVICE",
+            "FQDN",
+            "CIDR"
+          ]
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleEndpoints": {
+      "description": "RuleEndpoints represents local and remote endpoints.",
+      "type": "object",
+      "properties": {
+        "local": {
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleEndpoint"
+        },
+        "remote": {
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleEndpoint"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleList": {
+      "description": "RuleList is a list of Rule resources.",
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+          }
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "default": {},
+          "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleSession": {
+      "description": "RuleSession represents session parameters.",
+      "type": "object",
+      "properties": {
+        "traffic": {
+          "type": "string",
+          "enum": [
+            "BOTH",
+            "INGRESS",
+            "EGRESS"
+          ]
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleSpec": {
+      "description": "RuleSpec defines the desired state of a Rule.",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "ALLOW",
+            "DENY"
+          ]
+        },
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "endpoints": {
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleEndpoints"
+        },
+        "session": {
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleSession"
+        },
+        "transport": {
+          "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleTransport"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleTransport": {
+      "description": "RuleTransport represents network transport configuration.",
+      "type": "object",
+      "properties": {
+        "IPv": {
+          "type": "string",
+          "enum": [
+            "IPv4",
+            "IPv6"
+          ]
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TransportEntry"
+          }
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "TCP",
+            "UDP",
+            "ICMP"
+          ]
         }
       }
     },
@@ -2885,6 +3405,13 @@
         "metadata": {
           "default": {},
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "default": {},
+            "$ref": "#/definitions/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceRef"
+          }
         },
         "spec": {
           "default": {},
@@ -3020,7 +3547,11 @@
       "type": "object",
       "properties": {
         "IPv": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "IPv4",
+            "IPv6"
+          ]
         },
         "entries": {
           "type": "array",
@@ -3030,7 +3561,12 @@
           }
         },
         "protocol": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "TCP",
+            "UDP",
+            "ICMP"
+          ]
         }
       }
     },
@@ -3119,6 +3655,38 @@
         },
         "displayName": {
           "type": "string"
+        }
+      }
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Traffic": {
+      "description": "Traffic direction (BOTH, INGRESS, or EGRESS)",
+      "type": "string",
+      "enum": [
+        "BOTH",
+        "INGRESS",
+        "EGRESS"
+      ]
+    },
+    "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TransportEntry": {
+      "description": "TransportEntry represents a transport entry (ports or ICMP types).",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "ports": {
+          "type": "string"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0
+          }
         }
       }
     }

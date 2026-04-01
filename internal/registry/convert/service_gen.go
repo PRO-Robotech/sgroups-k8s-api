@@ -80,6 +80,7 @@ func ServiceFromProtoExt(in *sgroupsv1.ServiceResp_ServiceExt) *v1alpha1.Service
 			Description: in.GetSpec().GetDescription(),
 			Transports:  transports,
 		},
+		Refs: ResourceRefsFromProto(in.GetRefs()),
 	}
 	objectMetaFromProto(&out.ObjectMeta, in.GetMetadata())
 

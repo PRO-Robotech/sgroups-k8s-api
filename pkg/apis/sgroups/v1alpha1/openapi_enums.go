@@ -11,12 +11,63 @@ func GetEnumOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.O
 		OpenAPIPrefix + "Action": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
-					Description: "AddressGroup default action (ALLOW or DENY)",
+					Description: "Action (ALLOW or DENY)",
 					Type:        []string{"string"},
 					Enum: []interface{}{
-						string(ActionUnknown),
 						string(ActionAllow),
 						string(ActionDeny),
+					},
+				},
+			},
+		},
+		OpenAPIPrefix + "Protocol": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "Network transport protocol (TCP, UDP, or ICMP)",
+					Type:        []string{"string"},
+					Enum: []interface{}{
+						string(ProtocolTCP),
+						string(ProtocolUDP),
+						string(ProtocolICMP),
+					},
+				},
+			},
+		},
+		OpenAPIPrefix + "IpAddrFamily": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "IP address family (IPv4 or IPv6)",
+					Type:        []string{"string"},
+					Enum: []interface{}{
+						string(IpAddrFamilyIPv4),
+						string(IpAddrFamilyIPv6),
+					},
+				},
+			},
+		},
+		OpenAPIPrefix + "Traffic": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "Traffic direction (BOTH, INGRESS, or EGRESS)",
+					Type:        []string{"string"},
+					Enum: []interface{}{
+						string(TrafficBoth),
+						string(TrafficIngress),
+						string(TrafficEgress),
+					},
+				},
+			},
+		},
+		OpenAPIPrefix + "EndpointType": {
+			Schema: spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Description: "Endpoint type (ADDRESS_GROUP, SERVICE, FQDN, or CIDR)",
+					Type:        []string{"string"},
+					Enum: []interface{}{
+						string(EndpointTypeAddressGroup),
+						string(EndpointTypeService),
+						string(EndpointTypeFQDN),
+						string(EndpointTypeCIDR),
 					},
 				},
 			},
@@ -37,19 +88,51 @@ func GetOpenAPIDefinitionsWithEnums(ref common.ReferenceCallback) map[string]com
 }
 
 func modifyStructFieldsWithEnums(defs map[string]common.OpenAPIDefinition) {
-	agSpecKey := AddressGroupSpec{}.OpenAPIModelName()
-	if agSpec, exists := defs[agSpecKey]; exists {
-		if agSpec.Schema.Properties != nil {
-			if actionProp, ok := agSpec.Schema.Properties["defaultAction"]; ok {
-				actionProp.Enum = []interface{}{
-					string(ActionUnknown),
-					string(ActionAllow),
-					string(ActionDeny),
-				}
-				actionProp.Description = "Default action for the address group (ALLOW or DENY)"
-				agSpec.Schema.Properties["defaultAction"] = actionProp
-			}
-			defs[agSpecKey] = agSpec
-		}
+	actionEnum := []interface{}{
+		string(ActionAllow),
+		string(ActionDeny),
 	}
+	protocolEnum := []interface{}{
+		string(ProtocolTCP),
+		string(ProtocolUDP),
+		string(ProtocolICMP),
+	}
+	ipvEnum := []interface{}{
+		string(IpAddrFamilyIPv4),
+		string(IpAddrFamilyIPv6),
+	}
+	trafficEnum := []interface{}{
+		string(TrafficBoth),
+		string(TrafficIngress),
+		string(TrafficEgress),
+	}
+	endpointTypeEnum := []interface{}{
+		string(EndpointTypeAddressGroup),
+		string(EndpointTypeService),
+		string(EndpointTypeFQDN),
+		string(EndpointTypeCIDR),
+	}
+
+	setFieldEnum(defs, AddressGroupSpec{}.OpenAPIModelName(), "defaultAction", actionEnum)
+	setFieldEnum(defs, ServiceTransport{}.OpenAPIModelName(), "protocol", protocolEnum)
+	setFieldEnum(defs, ServiceTransport{}.OpenAPIModelName(), "IPv", ipvEnum)
+	setFieldEnum(defs, RuleTransport{}.OpenAPIModelName(), "protocol", protocolEnum)
+	setFieldEnum(defs, RuleTransport{}.OpenAPIModelName(), "IPv", ipvEnum)
+	setFieldEnum(defs, RuleSpec{}.OpenAPIModelName(), "action", actionEnum)
+	setFieldEnum(defs, RuleSession{}.OpenAPIModelName(), "traffic", trafficEnum)
+	setFieldEnum(defs, RuleEndpoint{}.OpenAPIModelName(), "type", endpointTypeEnum)
+}
+
+func setFieldEnum(defs map[string]common.OpenAPIDefinition, defKey, fieldName string, enum []interface{}) {
+	def, exists := defs[defKey]
+	if !exists || def.Schema.Properties == nil {
+		return
+	}
+	prop, ok := def.Schema.Properties[fieldName]
+	if !ok {
+		return
+	}
+	prop.Enum = enum
+	def.Schema.Properties[fieldName] = prop
+	defs[defKey] = def
 }

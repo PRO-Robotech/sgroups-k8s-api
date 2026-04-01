@@ -95,6 +95,7 @@ type AddressGroup struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	Spec              AddressGroupSpec `json:"spec,omitempty"`
+	Refs              []ResourceRef    `json:"refs,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -118,7 +119,8 @@ type NetworkSpec struct {
 type Network struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              NetworkSpec `json:"spec,omitempty"`
+	Spec              NetworkSpec   `json:"spec,omitempty"`
+	Refs              []ResourceRef `json:"refs,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -135,6 +137,13 @@ type ResourceIdentifier struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
+// ResourceRef represents a read-only reference to a related resource.
+type ResourceRef struct {
+	Name      string `json:"name,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
+	ResType   string `json:"resType,omitempty"`
+}
+
 // HostSpec defines the desired state of a Host.
 type HostSpec struct {
 	DisplayName string `json:"displayName,omitempty"`
@@ -147,7 +156,8 @@ type HostSpec struct {
 type Host struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              HostSpec `json:"spec,omitempty"`
+	Spec              HostSpec      `json:"spec,omitempty"`
+	Refs              []ResourceRef `json:"refs,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -236,7 +246,8 @@ type ServiceSpec struct {
 type Service struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              ServiceSpec `json:"spec,omitempty"`
+	Spec              ServiceSpec   `json:"spec,omitempty"`
+	Refs              []ResourceRef `json:"refs,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -401,6 +412,7 @@ func (NetworkBinding) OpenAPIModelName() string     { return OpenAPIPrefix + "Ne
 func (NetworkBindingList) OpenAPIModelName() string { return OpenAPIPrefix + "NetworkBindingList" }
 func (NetworkBindingSpec) OpenAPIModelName() string { return OpenAPIPrefix + "NetworkBindingSpec" }
 func (ResourceIdentifier) OpenAPIModelName() string { return OpenAPIPrefix + "ResourceIdentifier" }
+func (ResourceRef) OpenAPIModelName() string        { return OpenAPIPrefix + "ResourceRef" }
 func (Service) OpenAPIModelName() string            { return OpenAPIPrefix + "Service" }
 func (ServiceList) OpenAPIModelName() string        { return OpenAPIPrefix + "ServiceList" }
 func (ServiceSpec) OpenAPIModelName() string        { return OpenAPIPrefix + "ServiceSpec" }

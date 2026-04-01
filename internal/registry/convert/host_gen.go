@@ -59,6 +59,7 @@ func HostFromProtoExt(in *sgroupsv1.HostResp_HostExt) *v1alpha1.Host {
 			Comment:     in.GetSpec().GetComment(),
 			Description: in.GetSpec().GetDescription(),
 		},
+		Refs: ResourceRefsFromProto(in.GetRefs()),
 	}
 	objectMetaFromProto(&out.ObjectMeta, in.GetMetadata())
 
