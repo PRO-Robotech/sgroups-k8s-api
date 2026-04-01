@@ -263,23 +263,27 @@ func transportEntryFromProto(in *common.Transport_Entry) v1alpha1.TransportEntry
 
 func protocolToProto(p v1alpha1.Protocol) common.Transport_Protocol {
 	switch p {
+	case v1alpha1.ProtocolTCP:
+		return common.Transport_TCP
 	case v1alpha1.ProtocolUDP:
 		return common.Transport_UDP
 	case v1alpha1.ProtocolICMP:
 		return common.Transport_ICMP
 	default:
-		return common.Transport_TCP
+		return common.Transport_PROTOCOL_UNDEF
 	}
 }
 
 func protocolFromProto(p common.Transport_Protocol) v1alpha1.Protocol {
 	switch p {
+	case common.Transport_TCP:
+		return v1alpha1.ProtocolTCP
 	case common.Transport_UDP:
 		return v1alpha1.ProtocolUDP
 	case common.Transport_ICMP:
 		return v1alpha1.ProtocolICMP
 	default:
-		return v1alpha1.ProtocolTCP
+		return ""
 	}
 }
 
