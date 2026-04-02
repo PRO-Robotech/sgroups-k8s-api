@@ -19,7 +19,7 @@ func ResourceRefsFromProto(refs []*common.ResourceRef) []v1alpha1.ResourceRef {
 		out = append(out, v1alpha1.ResourceRef{
 			Name:      r.GetName(),
 			Namespace: r.GetNamespace(),
-			ResType:   r.GetResType(),
+			Kind:      r.GetResType(),
 		})
 	}
 

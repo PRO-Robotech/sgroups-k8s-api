@@ -3531,7 +3531,7 @@ func schema_pkg_apis_sgroups_v1alpha1_ResourceRef(ref common.ReferenceCallback) 
 							Format: "",
 						},
 					},
-					"resType": {
+					"kind": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",

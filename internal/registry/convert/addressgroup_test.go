@@ -190,9 +190,9 @@ func TestAddressGroupFromProtoExtWithRefs(t *testing.T) {
 	require.NotNil(t, got)
 	require.Len(t, got.Refs, 2)
 	require.Equal(t, "web-01", got.Refs[0].Name)
-	require.Equal(t, "Host", got.Refs[0].ResType)
+	require.Equal(t, "Host", got.Refs[0].Kind)
 	require.Equal(t, "corp-lan", got.Refs[1].Name)
-	require.Equal(t, "Network", got.Refs[1].ResType)
+	require.Equal(t, "Network", got.Refs[1].Kind)
 }
 
 func TestAddressGroupFromProtoExtNoRefs(t *testing.T) {

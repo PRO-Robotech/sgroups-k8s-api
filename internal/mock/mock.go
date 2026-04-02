@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"sgroups.io/sgroups-k8s-api/internal/backend"
+	"sgroups.io/sgroups-k8s-api/pkg/apis/sgroups/v1alpha1"
 
 	commonpb "github.com/PRO-Robotech/sgroups-proto/pkg/api/common"
 	sgroupsv1 "github.com/PRO-Robotech/sgroups-proto/pkg/api/sgroups/v1"
@@ -950,21 +951,21 @@ func (m *MockBackend) fillAddressGroupRefs(extList []*sgroupsv1.AddressGroupResp
 			ag := hb.GetSpec().GetAddressGroup()
 			if ag.GetName() == name && ag.GetNamespace() == ns {
 				h := hb.GetSpec().GetHost()
-				refs = append(refs, &commonpb.ResourceRef{Name: h.GetName(), Namespace: h.GetNamespace(), ResType: "Host"})
+				refs = append(refs, &commonpb.ResourceRef{Name: h.GetName(), Namespace: h.GetNamespace(), ResType: v1alpha1.KindHost})
 			}
 		}
 		for _, nb := range m.networkBindings {
 			ag := nb.GetSpec().GetAddressGroup()
 			if ag.GetName() == name && ag.GetNamespace() == ns {
 				nw := nb.GetSpec().GetNetwork()
-				refs = append(refs, &commonpb.ResourceRef{Name: nw.GetName(), Namespace: nw.GetNamespace(), ResType: "Network"})
+				refs = append(refs, &commonpb.ResourceRef{Name: nw.GetName(), Namespace: nw.GetNamespace(), ResType: v1alpha1.KindNetwork})
 			}
 		}
 		for _, sb := range m.serviceBindings {
 			ag := sb.GetSpec().GetAddressGroup()
 			if ag.GetName() == name && ag.GetNamespace() == ns {
 				svc := sb.GetSpec().GetService()
-				refs = append(refs, &commonpb.ResourceRef{Name: svc.GetName(), Namespace: svc.GetNamespace(), ResType: "Service"})
+				refs = append(refs, &commonpb.ResourceRef{Name: svc.GetName(), Namespace: svc.GetNamespace(), ResType: v1alpha1.KindService})
 			}
 		}
 		ext.Refs = refs
@@ -1020,7 +1021,7 @@ func (m *MockBackend) fillNetworkRefs(extList []*sgroupsv1.NetworkResp_NetworkEx
 			nw := nb.GetSpec().GetNetwork()
 			if nw.GetName() == name && nw.GetNamespace() == ns {
 				ag := nb.GetSpec().GetAddressGroup()
-				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: "AddressGroup"})
+				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: v1alpha1.KindAddressGroup})
 			}
 		}
 		ext.Refs = refs
@@ -1077,7 +1078,7 @@ func (m *MockBackend) fillHostRefs(extList []*sgroupsv1.HostResp_HostExt) {
 			h := hb.GetSpec().GetHost()
 			if h.GetName() == name && h.GetNamespace() == ns {
 				ag := hb.GetSpec().GetAddressGroup()
-				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: "AddressGroup"})
+				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: v1alpha1.KindAddressGroup})
 			}
 		}
 		ext.Refs = refs
@@ -2055,7 +2056,7 @@ func (m *MockBackend) fillServiceRefs(extList []*sgroupsv1.ServiceResp_ServiceEx
 			svc := sb.GetSpec().GetService()
 			if svc.GetName() == name && svc.GetNamespace() == ns {
 				ag := sb.GetSpec().GetAddressGroup()
-				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: "AddressGroup"})
+				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: v1alpha1.KindAddressGroup})
 			}
 		}
 		ext.Refs = refs

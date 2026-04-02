@@ -3213,13 +3213,13 @@
       "description": "ResourceRef represents a read-only reference to a related resource.",
       "type": "object",
       "properties": {
+        "kind": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
         "namespace": {
-          "type": "string"
-        },
-        "resType": {
           "type": "string"
         }
       }

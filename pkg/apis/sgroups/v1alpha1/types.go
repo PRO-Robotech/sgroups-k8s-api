@@ -141,7 +141,7 @@ type ResourceIdentifier struct {
 type ResourceRef struct {
 	Name      string `json:"name,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
-	ResType   string `json:"resType,omitempty"`
+	Kind      string `json:"kind,omitempty"`
 }
 
 // HostSpec defines the desired state of a Host.
