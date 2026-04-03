@@ -93,7 +93,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		HostBinding{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_HostBinding(ref),
 		HostBindingList{}.OpenAPIModelName():              schema_pkg_apis_sgroups_v1alpha1_HostBindingList(ref),
 		HostBindingSpec{}.OpenAPIModelName():              schema_pkg_apis_sgroups_v1alpha1_HostBindingSpec(ref),
+		HostIPs{}.OpenAPIModelName():                      schema_pkg_apis_sgroups_v1alpha1_HostIPs(ref),
 		HostList{}.OpenAPIModelName():                     schema_pkg_apis_sgroups_v1alpha1_HostList(ref),
+		HostMetaInfo{}.OpenAPIModelName():                 schema_pkg_apis_sgroups_v1alpha1_HostMetaInfo(ref),
 		HostSpec{}.OpenAPIModelName():                     schema_pkg_apis_sgroups_v1alpha1_HostSpec(ref),
 		Network{}.OpenAPIModelName():                      schema_pkg_apis_sgroups_v1alpha1_Network(ref),
 		NetworkBinding{}.OpenAPIModelName():               schema_pkg_apis_sgroups_v1alpha1_NetworkBinding(ref),
@@ -2989,11 +2991,24 @@ func schema_pkg_apis_sgroups_v1alpha1_Host(ref common.ReferenceCallback) common.
 							},
 						},
 					},
+					"ips": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(HostIPs{}.OpenAPIModelName()),
+						},
+					},
+					"metaInfo": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(HostMetaInfo{}.OpenAPIModelName()),
+						},
+					},
 				},
+				Required: []string{"ips", "metaInfo"},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), HostSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
+			v1.ObjectMeta{}.OpenAPIModelName(), HostIPs{}.OpenAPIModelName(), HostMetaInfo{}.OpenAPIModelName(), HostSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -3132,6 +3147,48 @@ func schema_pkg_apis_sgroups_v1alpha1_HostBindingSpec(ref common.ReferenceCallba
 	}
 }
 
+func schema_pkg_apis_sgroups_v1alpha1_HostIPs(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HostIPs contains IP addresses associated with a Host (read-only).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"IPv4": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"IPv6": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"IPv4", "IPv6"},
+			},
+		},
+	}
+}
+
 func schema_pkg_apis_sgroups_v1alpha1_HostList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3178,6 +3235,62 @@ func schema_pkg_apis_sgroups_v1alpha1_HostList(ref common.ReferenceCallback) com
 		},
 		Dependencies: []string{
 			v1.ListMeta{}.OpenAPIModelName(), Host{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_HostMetaInfo(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HostMetaInfo contains system information about a Host (read-only).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hostName": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"os": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"platform": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"platformFamily": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"platformVersion": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"kernelVersion": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"hostName", "os", "platform", "platformFamily", "platformVersion", "kernelVersion"},
+			},
+		},
 	}
 }
 

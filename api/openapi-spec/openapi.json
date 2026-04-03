@@ -3065,14 +3065,34 @@
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host": {
         "description": "Host represents a host resource.",
         "type": "object",
+        "required": [
+          "ips",
+          "metaInfo"
+        ],
         "properties": {
           "apiVersion": {
             "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
             "type": "string"
           },
+          "ips": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostIPs"
+              }
+            ]
+          },
           "kind": {
             "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
             "type": "string"
+          },
+          "metaInfo": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostMetaInfo"
+              }
+            ]
           },
           "metadata": {
             "default": {},
@@ -3200,6 +3220,30 @@
           }
         }
       },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostIPs": {
+        "description": "HostIPs contains IP addresses associated with a Host (read-only).",
+        "type": "object",
+        "required": [
+          "IPv4",
+          "IPv6"
+        ],
+        "properties": {
+          "IPv4": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          "IPv6": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        }
+      },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostList": {
         "description": "HostList is a list of Host resources.",
         "type": "object",
@@ -3233,6 +3277,44 @@
                 "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
               }
             ]
+          }
+        }
+      },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostMetaInfo": {
+        "description": "HostMetaInfo contains system information about a Host (read-only).",
+        "type": "object",
+        "required": [
+          "hostName",
+          "os",
+          "platform",
+          "platformFamily",
+          "platformVersion",
+          "kernelVersion"
+        ],
+        "properties": {
+          "hostName": {
+            "type": "string",
+            "default": ""
+          },
+          "kernelVersion": {
+            "type": "string",
+            "default": ""
+          },
+          "os": {
+            "type": "string",
+            "default": ""
+          },
+          "platform": {
+            "type": "string",
+            "default": ""
+          },
+          "platformFamily": {
+            "type": "string",
+            "default": ""
+          },
+          "platformVersion": {
+            "type": "string",
+            "default": ""
           }
         }
       },

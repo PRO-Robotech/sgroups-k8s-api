@@ -144,6 +144,22 @@ type ResourceRef struct {
 	Kind      string `json:"kind,omitempty"`
 }
 
+// HostIPs contains IP addresses associated with a Host (read-only).
+type HostIPs struct {
+	IPv4 []string `json:"IPv4"`
+	IPv6 []string `json:"IPv6"`
+}
+
+// HostMetaInfo contains system information about a Host (read-only).
+type HostMetaInfo struct {
+	HostName        string `json:"hostName"`
+	OS              string `json:"os"`
+	Platform        string `json:"platform"`
+	PlatformFamily  string `json:"platformFamily"`
+	PlatformVersion string `json:"platformVersion"`
+	KernelVersion   string `json:"kernelVersion"`
+}
+
 // HostSpec defines the desired state of a Host.
 type HostSpec struct {
 	DisplayName string `json:"displayName,omitempty"`
@@ -158,6 +174,8 @@ type Host struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	Spec              HostSpec      `json:"spec,omitempty"`
 	Refs              []ResourceRef `json:"refs,omitempty"`
+	IPs               HostIPs       `json:"ips"`
+	MetaInfo          HostMetaInfo  `json:"metaInfo"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -413,6 +431,8 @@ func (NetworkBindingList) OpenAPIModelName() string { return OpenAPIPrefix + "Ne
 func (NetworkBindingSpec) OpenAPIModelName() string { return OpenAPIPrefix + "NetworkBindingSpec" }
 func (ResourceIdentifier) OpenAPIModelName() string { return OpenAPIPrefix + "ResourceIdentifier" }
 func (ResourceRef) OpenAPIModelName() string        { return OpenAPIPrefix + "ResourceRef" }
+func (HostIPs) OpenAPIModelName() string            { return OpenAPIPrefix + "HostIPs" }
+func (HostMetaInfo) OpenAPIModelName() string       { return OpenAPIPrefix + "HostMetaInfo" }
 func (Service) OpenAPIModelName() string            { return OpenAPIPrefix + "Service" }
 func (ServiceList) OpenAPIModelName() string        { return OpenAPIPrefix + "ServiceList" }
 func (ServiceSpec) OpenAPIModelName() string        { return OpenAPIPrefix + "ServiceSpec" }

@@ -1,6 +1,7 @@
 package convert
 
 import (
+	common "github.com/PRO-Robotech/sgroups-proto/pkg/api/common"
 	sgroupsv1 "github.com/PRO-Robotech/sgroups-proto/pkg/api/sgroups/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -38,6 +39,8 @@ func HostFromProto(in *sgroupsv1.Host) *v1alpha1.Host {
 			Comment:     in.GetSpec().GetComment(),
 			Description: in.GetSpec().GetDescription(),
 		},
+		IPs:      hostIPsFromProto(in.GetSpec().GetIps()),
+		MetaInfo: hostMetaInfoFromProto(in.GetSpec().GetMetaInfo()),
 	}
 	objectMetaFromProto(&out.ObjectMeta, in.GetMetadata())
 
@@ -59,9 +62,37 @@ func HostFromProtoExt(in *sgroupsv1.HostResp_HostExt) *v1alpha1.Host {
 			Comment:     in.GetSpec().GetComment(),
 			Description: in.GetSpec().GetDescription(),
 		},
-		Refs: ResourceRefsFromProto(in.GetRefs()),
+		Refs:     ResourceRefsFromProto(in.GetRefs()),
+		IPs:      hostIPsFromProto(in.GetSpec().GetIps()),
+		MetaInfo: hostMetaInfoFromProto(in.GetSpec().GetMetaInfo()),
 	}
 	objectMetaFromProto(&out.ObjectMeta, in.GetMetadata())
 
 	return out
+}
+
+func hostIPsFromProto(in *common.IPs) v1alpha1.HostIPs {
+	if in == nil {
+		return v1alpha1.HostIPs{}
+	}
+
+	return v1alpha1.HostIPs{
+		IPv4: in.GetIpv4(),
+		IPv6: in.GetIpv6(),
+	}
+}
+
+func hostMetaInfoFromProto(in *sgroupsv1.Host_Spec_MetaInfo) v1alpha1.HostMetaInfo {
+	if in == nil {
+		return v1alpha1.HostMetaInfo{}
+	}
+
+	return v1alpha1.HostMetaInfo{
+		HostName:        in.GetHostName(),
+		OS:              in.GetOs(),
+		Platform:        in.GetPlatform(),
+		PlatformFamily:  in.GetPlatformFamily(),
+		PlatformVersion: in.GetPlatformVersion(),
+		KernelVersion:   in.GetKernelVersion(),
+	}
 }
