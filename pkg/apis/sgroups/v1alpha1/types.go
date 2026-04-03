@@ -51,9 +51,9 @@ const (
 type Action string
 
 const (
-	ActionUnknown Action = "UNKNOWN"
-	ActionAllow   Action = "ALLOW"
-	ActionDeny    Action = "DENY"
+	ActionUnknown Action = "Unknown"
+	ActionAllow   Action = "Allow"
+	ActionDeny    Action = "Deny"
 )
 
 // TenantSpec defines the desired state of a Tenant.
@@ -305,9 +305,9 @@ type ServiceBindingList struct {
 type Traffic string
 
 const (
-	TrafficBoth    Traffic = "BOTH"
-	TrafficIngress Traffic = "INGRESS"
-	TrafficEgress  Traffic = "EGRESS"
+	TrafficBoth    Traffic = "Both"
+	TrafficIngress Traffic = "Ingress"
+	TrafficEgress  Traffic = "Egress"
 )
 
 // Protocol represents network transport protocol.
@@ -332,9 +332,9 @@ const (
 type EndpointType string
 
 const (
-	EndpointTypeUnknown      EndpointType = "UNKNOWN"
-	EndpointTypeAddressGroup EndpointType = "ADDRESS_GROUP"
-	EndpointTypeService      EndpointType = "SERVICE"
+	EndpointTypeUnknown      EndpointType = "Unknown"
+	EndpointTypeAddressGroup EndpointType = "AddressGroup"
+	EndpointTypeService      EndpointType = "Service"
 	EndpointTypeFQDN         EndpointType = "FQDN"
 	EndpointTypeCIDR         EndpointType = "CIDR"
 )

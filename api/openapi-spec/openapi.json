@@ -2940,11 +2940,11 @@
         "format": "date-time"
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Action": {
-        "description": "Action (ALLOW or DENY)",
+        "description": "Action (Allow or Deny)",
         "type": "string",
         "enum": [
-          "ALLOW",
-          "DENY"
+          "Allow",
+          "Deny"
         ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup": {
@@ -3034,8 +3034,8 @@
           "defaultAction": {
             "type": "string",
             "enum": [
-              "ALLOW",
-              "DENY"
+              "Allow",
+              "Deny"
             ]
           },
           "description": {
@@ -3053,11 +3053,11 @@
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.EndpointType": {
-        "description": "Endpoint type (ADDRESS_GROUP, SERVICE, FQDN, or CIDR)",
+        "description": "Endpoint type (AddressGroup, Service, FQDN, or CIDR)",
         "type": "string",
         "enum": [
-          "ADDRESS_GROUP",
-          "SERVICE",
+          "AddressGroup",
+          "Service",
           "FQDN",
           "CIDR"
         ]
@@ -3619,8 +3619,8 @@
           "type": {
             "type": "string",
             "enum": [
-              "ADDRESS_GROUP",
-              "SERVICE",
+              "AddressGroup",
+              "Service",
               "FQDN",
               "CIDR"
             ]
@@ -3685,9 +3685,9 @@
           "traffic": {
             "type": "string",
             "enum": [
-              "BOTH",
-              "INGRESS",
-              "EGRESS"
+              "Both",
+              "Ingress",
+              "Egress"
             ]
           }
         }
@@ -3699,8 +3699,8 @@
           "action": {
             "type": "string",
             "enum": [
-              "ALLOW",
-              "DENY"
+              "Allow",
+              "Deny"
             ]
           },
           "comment": {
@@ -4111,12 +4111,12 @@
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Traffic": {
-        "description": "Traffic direction (BOTH, INGRESS, or EGRESS)",
+        "description": "Traffic direction (Both, Ingress, or Egress)",
         "type": "string",
         "enum": [
-          "BOTH",
-          "INGRESS",
-          "EGRESS"
+          "Both",
+          "Ingress",
+          "Egress"
         ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TransportEntry": {

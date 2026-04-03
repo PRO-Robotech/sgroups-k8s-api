@@ -11,7 +11,7 @@ func GetEnumOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.O
 		OpenAPIPrefix + "Action": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
-					Description: "Action (ALLOW or DENY)",
+					Description: "Action (Allow or Deny)",
 					Type:        []string{"string"},
 					Enum: []interface{}{
 						string(ActionAllow),
@@ -48,7 +48,7 @@ func GetEnumOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.O
 		OpenAPIPrefix + "Traffic": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
-					Description: "Traffic direction (BOTH, INGRESS, or EGRESS)",
+					Description: "Traffic direction (Both, Ingress, or Egress)",
 					Type:        []string{"string"},
 					Enum: []interface{}{
 						string(TrafficBoth),
@@ -61,7 +61,7 @@ func GetEnumOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.O
 		OpenAPIPrefix + "EndpointType": {
 			Schema: spec.Schema{
 				SchemaProps: spec.SchemaProps{
-					Description: "Endpoint type (ADDRESS_GROUP, SERVICE, FQDN, or CIDR)",
+					Description: "Endpoint type (AddressGroup, Service, FQDN, or CIDR)",
 					Type:        []string{"string"},
 					Enum: []interface{}{
 						string(EndpointTypeAddressGroup),
