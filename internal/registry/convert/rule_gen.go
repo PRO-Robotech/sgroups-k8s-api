@@ -77,23 +77,27 @@ func sessionFromProto(in *common.Session) *v1alpha1.RuleSession {
 
 func trafficToProto(t v1alpha1.Traffic) common.Session_Traffic {
 	switch t {
+	case v1alpha1.TrafficBoth:
+		return common.Session_BOTH
 	case v1alpha1.TrafficIngress:
 		return common.Session_INGRESS
 	case v1alpha1.TrafficEgress:
 		return common.Session_EGRESS
 	default:
-		return common.Session_BOTH
+		return common.Session_TRAFFIC_UNDEF
 	}
 }
 
 func trafficFromProto(t common.Session_Traffic) v1alpha1.Traffic {
 	switch t {
+	case common.Session_BOTH:
+		return v1alpha1.TrafficBoth
 	case common.Session_INGRESS:
 		return v1alpha1.TrafficIngress
 	case common.Session_EGRESS:
 		return v1alpha1.TrafficEgress
 	default:
-		return v1alpha1.TrafficBoth
+		return ""
 	}
 }
 

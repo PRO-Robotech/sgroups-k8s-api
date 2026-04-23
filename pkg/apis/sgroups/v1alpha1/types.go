@@ -174,8 +174,8 @@ type Host struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	Spec              HostSpec      `json:"spec,omitempty"`
 	Refs              []ResourceRef `json:"refs,omitempty"`
-	IPs               HostIPs       `json:"ips"`
-	MetaInfo          HostMetaInfo  `json:"metaInfo"`
+	IPs               HostIPs       `json:"ips,omitempty"`
+	MetaInfo          HostMetaInfo  `json:"metaInfo,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

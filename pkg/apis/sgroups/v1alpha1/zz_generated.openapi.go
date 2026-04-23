@@ -3004,7 +3004,6 @@ func schema_pkg_apis_sgroups_v1alpha1_Host(ref common.ReferenceCallback) common.
 						},
 					},
 				},
-				Required: []string{"ips", "metaInfo"},
 			},
 		},
 		Dependencies: []string{
