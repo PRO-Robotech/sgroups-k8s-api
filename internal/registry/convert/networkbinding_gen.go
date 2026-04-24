@@ -1,3 +1,4 @@
+//nolint:dupl // parallel scaffold for NetworkBinding and ServiceBinding intentionally mirrors structure
 package convert
 
 import (
