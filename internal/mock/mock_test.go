@@ -378,7 +378,7 @@ func TestRuleWatchWithSelector(t *testing.T) {
 
 	// We should receive the prod event (dev may or may not arrive as empty filtered)
 	received := false
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		select {
 		case evt := <-ws.C:
 			for _, r := range evt.Rules {
@@ -390,7 +390,6 @@ func TestRuleWatchWithSelector(t *testing.T) {
 				}
 			}
 		case <-time.After(500 * time.Millisecond):
-			break
 		}
 		if received {
 			break

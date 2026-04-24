@@ -20,7 +20,7 @@ import (
 
 type MockBackend struct {
 	mu              sync.RWMutex
-	version         int64
+	version         atomic.Int64
 	namespaces      map[string]*sgroupsv1.Namespace
 	addressGroups   map[string]*sgroupsv1.AddressGroup
 	networks        map[string]*sgroupsv1.Network
@@ -157,7 +157,7 @@ func (m *MockBackend) ListNamespaces(ctx context.Context, req *sgroupsv1.Namespa
 	filtered := filterNamespaces(req.Selectors, items)
 
 	return &sgroupsv1.NamespaceResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		Namespaces:      filtered,
 	}, nil
 }
@@ -280,7 +280,7 @@ func (m *MockBackend) ListAddressGroups(ctx context.Context, req *sgroupsv1.Addr
 	m.mu.RUnlock()
 
 	return &sgroupsv1.AddressGroupResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		AddressGroups:   extList,
 	}, nil
 }
@@ -403,7 +403,7 @@ func (m *MockBackend) ListNetworks(ctx context.Context, req *sgroupsv1.NetworkRe
 	m.mu.RUnlock()
 
 	return &sgroupsv1.NetworkResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		Networks:        extList,
 	}, nil
 }
@@ -526,7 +526,7 @@ func (m *MockBackend) ListHosts(ctx context.Context, req *sgroupsv1.HostReq_List
 	m.mu.RUnlock()
 
 	return &sgroupsv1.HostResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		Hosts:           extList,
 	}, nil
 }
@@ -647,7 +647,7 @@ func (m *MockBackend) ListHostBindings(ctx context.Context, req *sgroupsv1.HostB
 	filtered := filterHostBindings(req.Selectors, items)
 
 	return &sgroupsv1.HostBindingResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		HostBindings:    filtered,
 	}, nil
 }
@@ -768,7 +768,7 @@ func (m *MockBackend) ListNetworkBindings(ctx context.Context, req *sgroupsv1.Ne
 	filtered := filterNetworkBindings(req.Selectors, items)
 
 	return &sgroupsv1.NetworkBindingResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		NetworkBindings: filtered,
 	}, nil
 }
@@ -808,7 +808,7 @@ func (m *MockBackend) upsertNamespaceLocked(ns *sgroupsv1.Namespace) (*sgroupsv1
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.namespaces[uid] = clone
 
 	return clone, !ok
@@ -827,7 +827,7 @@ func (m *MockBackend) upsertAddressGroupLocked(ag *sgroupsv1.AddressGroup) (*sgr
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.addressGroups[uid] = clone
 
 	return clone, !ok
@@ -846,7 +846,7 @@ func (m *MockBackend) upsertHostLocked(h *sgroupsv1.Host) (*sgroupsv1.Host, bool
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.hosts[uid] = clone
 
 	return clone, !ok
@@ -865,7 +865,7 @@ func (m *MockBackend) upsertHostBindingLocked(hb *sgroupsv1.HostBinding) (*sgrou
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.hostBindings[uid] = clone
 
 	return clone, !ok
@@ -884,7 +884,7 @@ func (m *MockBackend) upsertNetworkBindingLocked(nb *sgroupsv1.NetworkBinding) (
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.networkBindings[uid] = clone
 
 	return clone, !ok
@@ -903,7 +903,7 @@ func (m *MockBackend) upsertNetworkLocked(nw *sgroupsv1.Network) (*sgroupsv1.Net
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.networks[uid] = clone
 
 	return clone, !ok
@@ -1976,7 +1976,7 @@ func (m *MockBackend) ListServices(ctx context.Context, req *sgroupsv1.ServiceRe
 	m.mu.RUnlock()
 
 	return &sgroupsv1.ServiceResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		Services:        extList,
 	}, nil
 }
@@ -2016,7 +2016,7 @@ func (m *MockBackend) upsertServiceLocked(svc *sgroupsv1.Service) (*sgroupsv1.Se
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.services[uid] = clone
 
 	return clone, !ok
@@ -2304,7 +2304,7 @@ func (m *MockBackend) ListServiceBindings(ctx context.Context, req *sgroupsv1.Se
 	filtered := filterServiceBindings(req.Selectors, items)
 
 	return &sgroupsv1.ServiceBindingResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		ServiceBindings: filtered,
 	}, nil
 }
@@ -2344,7 +2344,7 @@ func (m *MockBackend) upsertServiceBindingLocked(sb *sgroupsv1.ServiceBinding) (
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.serviceBindings[uid] = clone
 
 	return clone, !ok
@@ -2588,7 +2588,7 @@ func (m *MockBackend) ListRules(ctx context.Context, req *sgroupsv1.RuleReq_List
 	filtered := filterRules(req.Selectors, items)
 
 	return &sgroupsv1.RuleResp_List{
-		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ResourceVersion: strconv.FormatInt(m.version.Load(), 10),
 		Rules:           filtered,
 	}, nil
 }
@@ -2628,7 +2628,7 @@ func (m *MockBackend) upsertRuleLocked(r *sgroupsv1.Rule) (*sgroupsv1.Rule, bool
 	} else if clone.Metadata.CreationTimestamp == nil {
 		clone.Metadata.CreationTimestamp = timestamppb.Now()
 	}
-	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	clone.Metadata.ResourceVersion = strconv.FormatInt(m.version.Add(1), 10)
 	m.rules[uid] = clone
 
 	return clone, !ok
