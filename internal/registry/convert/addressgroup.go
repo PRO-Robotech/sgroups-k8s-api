@@ -25,7 +25,6 @@ func AddressGroupToProto(in *v1alpha1.AddressGroup) *sgroupsv1.AddressGroup {
 	}
 }
 
-//nolint:dupl // AddressGroupFromProto and AddressGroupFromProtoExt share structure but differ in input type
 func AddressGroupFromProto(in *sgroupsv1.AddressGroup) *v1alpha1.AddressGroup {
 	if in == nil {
 		return nil
@@ -49,7 +48,6 @@ func AddressGroupFromProto(in *sgroupsv1.AddressGroup) *v1alpha1.AddressGroup {
 	return out
 }
 
-//nolint:dupl // AddressGroupFromProto and AddressGroupFromProtoExt share structure but differ in input type
 func AddressGroupFromProtoExt(in *sgroupsv1.AddressGroupResp_AddressGroupExt) *v1alpha1.AddressGroup {
 	if in == nil {
 		return nil
@@ -67,6 +65,7 @@ func AddressGroupFromProtoExt(in *sgroupsv1.AddressGroupResp_AddressGroupExt) *v
 			Logs:          in.GetSpec().GetLogs(),
 			Trace:         in.GetSpec().GetTrace(),
 		},
+		Refs: ResourceRefsFromProto(in.GetRefs()),
 	}
 	objectMetaFromProto(&out.ObjectMeta, in.GetMetadata())
 

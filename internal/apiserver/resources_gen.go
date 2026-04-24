@@ -10,6 +10,9 @@ import (
 	"sgroups.io/sgroups-k8s-api/internal/registry/network"
 	"sgroups.io/sgroups-k8s-api/internal/registry/networkbinding"
 	registryoptions "sgroups.io/sgroups-k8s-api/internal/registry/options"
+	"sgroups.io/sgroups-k8s-api/internal/registry/rule"
+	"sgroups.io/sgroups-k8s-api/internal/registry/service"
+	"sgroups.io/sgroups-k8s-api/internal/registry/servicebinding"
 	"sgroups.io/sgroups-k8s-api/internal/registry/tenant"
 	"sgroups.io/sgroups-k8s-api/pkg/client"
 )
@@ -22,6 +25,9 @@ func buildStorageMap(grpcClient *client.Client, opts registryoptions.StorageOpti
 			"hosts":           host.NewStorage(grpcClient, opts),
 			"networkbindings": networkbinding.NewStorage(grpcClient, opts),
 			"networks":        network.NewStorage(grpcClient, opts),
+			"rules":           rule.NewStorage(grpcClient, opts),
+			"servicebindings": servicebinding.NewStorage(grpcClient, opts),
+			"services":        service.NewStorage(grpcClient, opts),
 			"tenants":         tenant.NewStorage(grpcClient, opts),
 		},
 	}

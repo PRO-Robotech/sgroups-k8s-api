@@ -173,6 +173,39 @@ func TestAddressGroupFromProtoExt(t *testing.T) {
 	require.True(t, fromProto.CreationTimestamp.Time.Equal(got.CreationTimestamp.Time))
 }
 
+func TestAddressGroupFromProtoExtWithRefs(t *testing.T) {
+	ext := &sgroupsv1.AddressGroupResp_AddressGroupExt{
+		Metadata: &commonpb.Metadata{
+			Name:      "ag-with-refs",
+			Namespace: "default",
+		},
+		Spec: &sgroupsv1.AddressGroup_Spec{DisplayName: "AG"},
+		Refs: []*commonpb.ResourceRef{
+			{Name: "web-01", Namespace: "default", ResType: "Host"},
+			{Name: "corp-lan", Namespace: "default", ResType: "Network"},
+		},
+	}
+
+	got := AddressGroupFromProtoExt(ext)
+	require.NotNil(t, got)
+	require.Len(t, got.Refs, 2)
+	require.Equal(t, "web-01", got.Refs[0].Name)
+	require.Equal(t, "Host", got.Refs[0].Kind)
+	require.Equal(t, "corp-lan", got.Refs[1].Name)
+	require.Equal(t, "Network", got.Refs[1].Kind)
+}
+
+func TestAddressGroupFromProtoExtNoRefs(t *testing.T) {
+	ext := &sgroupsv1.AddressGroupResp_AddressGroupExt{
+		Metadata: &commonpb.Metadata{Name: "ag-no-refs", Namespace: "default"},
+		Spec:     &sgroupsv1.AddressGroup_Spec{DisplayName: "AG"},
+	}
+
+	got := AddressGroupFromProtoExt(ext)
+	require.NotNil(t, got)
+	require.Nil(t, got.Refs)
+}
+
 func TestAddressGroupNilSafety(t *testing.T) {
 	require.Nil(t, AddressGroupToProto(nil))
 	require.Nil(t, AddressGroupFromProto(nil))

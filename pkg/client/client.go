@@ -14,6 +14,9 @@ type Client struct {
 	Hosts           sgroupsv1.SGroupsHostsAPIClient
 	HostBindings    sgroupsv1.SGroupsHostBindingAPIClient
 	NetworkBindings sgroupsv1.SGroupsNetworkBindingAPIClient
+	Services        sgroupsv1.SGroupsServicesAPIClient
+	ServiceBindings sgroupsv1.SGroupsServiceBindingAPIClient
+	Rules           sgroupsv1.SGroupsRulesAPIClient
 }
 
 func Dial(addr string, opts ...grpc.DialOption) (*Client, error) {

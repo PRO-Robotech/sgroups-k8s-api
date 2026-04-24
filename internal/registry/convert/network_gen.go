@@ -62,6 +62,7 @@ func NetworkFromProtoExt(in *sgroupsv1.NetworkResp_NetworkExt) *v1alpha1.Network
 			Description: in.GetSpec().GetDescription(),
 			CIDR:        in.GetSpec().GetCidr(),
 		},
+		Refs: ResourceRefsFromProto(in.GetRefs()),
 	}
 	objectMetaFromProto(&out.ObjectMeta, in.GetMetadata())
 

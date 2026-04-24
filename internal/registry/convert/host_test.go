@@ -116,6 +116,68 @@ func TestHostFromProtoExt(t *testing.T) {
 	require.True(t, ts.Equal(got.CreationTimestamp.Time))
 }
 
+func TestHostFromProtoWithIPs(t *testing.T) {
+	host := &sgroupsv1.Host{
+		Metadata: &commonpb.Metadata{Name: "h1", Namespace: "default"},
+		Spec: &sgroupsv1.Host_Spec{
+			DisplayName: "H1",
+			Ips: &commonpb.IPs{
+				Ipv4: []string{"10.0.0.1", "10.0.0.2"},
+				Ipv6: []string{"fe80::1"},
+			},
+			MetaInfo: &sgroupsv1.Host_Spec_MetaInfo{
+				HostName:        "h1.local",
+				Os:              "linux",
+				Platform:        "ubuntu",
+				PlatformFamily:  "debian",
+				PlatformVersion: "22.04",
+				KernelVersion:   "5.15.0",
+			},
+		},
+	}
+
+	got := HostFromProto(host)
+	require.NotNil(t, got)
+	require.Equal(t, []string{"10.0.0.1", "10.0.0.2"}, got.IPs.IPv4)
+	require.Equal(t, []string{"fe80::1"}, got.IPs.IPv6)
+	require.Equal(t, "h1.local", got.MetaInfo.HostName)
+	require.Equal(t, "linux", got.MetaInfo.OS)
+	require.Equal(t, "ubuntu", got.MetaInfo.Platform)
+	require.Equal(t, "debian", got.MetaInfo.PlatformFamily)
+	require.Equal(t, "22.04", got.MetaInfo.PlatformVersion)
+	require.Equal(t, "5.15.0", got.MetaInfo.KernelVersion)
+}
+
+func TestHostFromProtoExtWithIPs(t *testing.T) {
+	ext := &sgroupsv1.HostResp_HostExt{
+		Metadata: &commonpb.Metadata{Name: "h2", Namespace: "default"},
+		Spec: &sgroupsv1.Host_Spec{
+			DisplayName: "H2",
+			Ips:         &commonpb.IPs{Ipv4: []string{"192.168.1.1"}},
+			MetaInfo:    &sgroupsv1.Host_Spec_MetaInfo{Os: "windows"},
+		},
+	}
+
+	got := HostFromProtoExt(ext)
+	require.NotNil(t, got)
+	require.Equal(t, []string{"192.168.1.1"}, got.IPs.IPv4)
+	require.Nil(t, got.IPs.IPv6)
+	require.Equal(t, "windows", got.MetaInfo.OS)
+}
+
+func TestHostFromProtoNoIPs(t *testing.T) {
+	host := &sgroupsv1.Host{
+		Metadata: &commonpb.Metadata{Name: "h3", Namespace: "default"},
+		Spec:     &sgroupsv1.Host_Spec{DisplayName: "H3"},
+	}
+
+	got := HostFromProto(host)
+	require.NotNil(t, got)
+	require.Empty(t, got.IPs.IPv4)
+	require.Empty(t, got.IPs.IPv6)
+	require.Empty(t, got.MetaInfo.HostName)
+}
+
 func TestHostNilSafety(t *testing.T) {
 	require.Nil(t, HostToProto(nil))
 	require.Nil(t, HostFromProto(nil))

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"sgroups.io/sgroups-k8s-api/internal/backend"
+	"sgroups.io/sgroups-k8s-api/pkg/apis/sgroups/v1alpha1"
 
 	commonpb "github.com/PRO-Robotech/sgroups-proto/pkg/api/common"
 	sgroupsv1 "github.com/PRO-Robotech/sgroups-proto/pkg/api/sgroups/v1"
@@ -26,12 +27,18 @@ type MockBackend struct {
 	hosts           map[string]*sgroupsv1.Host
 	hostBindings    map[string]*sgroupsv1.HostBinding
 	networkBindings map[string]*sgroupsv1.NetworkBinding
+	services        map[string]*sgroupsv1.Service
+	serviceBindings map[string]*sgroupsv1.ServiceBinding
+	rules           map[string]*sgroupsv1.Rule
 	nsHub           *namespaceWatchHub
 	agHub           *addressGroupWatchHub
 	nwHub           *networkWatchHub
 	hostHub         *hostWatchHub
 	hbHub           *hostBindingWatchHub
 	nbHub           *networkBindingWatchHub
+	svcHub          *serviceWatchHub
+	sbHub           *serviceBindingWatchHub
+	ruleHub         *ruleWatchHub
 }
 
 func New() *MockBackend {
@@ -42,12 +49,18 @@ func New() *MockBackend {
 		hosts:           make(map[string]*sgroupsv1.Host),
 		hostBindings:    make(map[string]*sgroupsv1.HostBinding),
 		networkBindings: make(map[string]*sgroupsv1.NetworkBinding),
+		services:        make(map[string]*sgroupsv1.Service),
+		serviceBindings: make(map[string]*sgroupsv1.ServiceBinding),
+		rules:           make(map[string]*sgroupsv1.Rule),
 		nsHub:           newNamespaceWatchHub(),
 		agHub:           newAddressGroupWatchHub(),
 		nwHub:           newNetworkWatchHub(),
 		hostHub:         newHostWatchHub(),
 		hbHub:           newHostBindingWatchHub(),
 		nbHub:           newNetworkBindingWatchHub(),
+		svcHub:          newServiceWatchHub(),
+		sbHub:           newServiceBindingWatchHub(),
+		ruleHub:         newRuleWatchHub(),
 	}
 }
 
@@ -260,13 +273,15 @@ func (m *MockBackend) ListAddressGroups(ctx context.Context, req *sgroupsv1.Addr
 	for _, ag := range m.addressGroups {
 		items = append(items, ag)
 	}
-	m.mu.RUnlock()
 
 	filtered := filterAddressGroups(req.Selectors, items)
+	extList := toAddressGroupExtList(filtered)
+	m.fillAddressGroupRefs(extList)
+	m.mu.RUnlock()
 
 	return &sgroupsv1.AddressGroupResp_List{
 		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
-		AddressGroups:   toAddressGroupExtList(filtered),
+		AddressGroups:   extList,
 	}, nil
 }
 
@@ -381,13 +396,15 @@ func (m *MockBackend) ListNetworks(ctx context.Context, req *sgroupsv1.NetworkRe
 	for _, nw := range m.networks {
 		items = append(items, nw)
 	}
-	m.mu.RUnlock()
 
 	filtered := filterNetworks(req.Selectors, items)
+	extList := toNetworkExtList(filtered)
+	m.fillNetworkRefs(extList)
+	m.mu.RUnlock()
 
 	return &sgroupsv1.NetworkResp_List{
 		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
-		Networks:        toNetworkExtList(filtered),
+		Networks:        extList,
 	}, nil
 }
 
@@ -502,13 +519,15 @@ func (m *MockBackend) ListHosts(ctx context.Context, req *sgroupsv1.HostReq_List
 	for _, h := range m.hosts {
 		items = append(items, h)
 	}
-	m.mu.RUnlock()
 
 	filtered := filterHosts(req.Selectors, items)
+	extList := toHostExtList(filtered)
+	m.fillHostRefs(extList)
+	m.mu.RUnlock()
 
 	return &sgroupsv1.HostResp_List{
 		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
-		Hosts:           toHostExtList(filtered),
+		Hosts:           extList,
 	}, nil
 }
 
@@ -921,6 +940,38 @@ func toAddressGroupExtList(items []*sgroupsv1.AddressGroup) []*sgroupsv1.Address
 	return out
 }
 
+// fillAddressGroupRefs computes refs for each AddressGroup by scanning bindings.
+// Must be called while m.mu.RLock is held.
+func (m *MockBackend) fillAddressGroupRefs(extList []*sgroupsv1.AddressGroupResp_AddressGroupExt) {
+	for _, ext := range extList {
+		name := ext.GetMetadata().GetName()
+		ns := ext.GetMetadata().GetNamespace()
+		var refs []*commonpb.ResourceRef
+		for _, hb := range m.hostBindings {
+			ag := hb.GetSpec().GetAddressGroup()
+			if ag.GetName() == name && ag.GetNamespace() == ns {
+				h := hb.GetSpec().GetHost()
+				refs = append(refs, &commonpb.ResourceRef{Name: h.GetName(), Namespace: h.GetNamespace(), ResType: v1alpha1.KindHost})
+			}
+		}
+		for _, nb := range m.networkBindings {
+			ag := nb.GetSpec().GetAddressGroup()
+			if ag.GetName() == name && ag.GetNamespace() == ns {
+				nw := nb.GetSpec().GetNetwork()
+				refs = append(refs, &commonpb.ResourceRef{Name: nw.GetName(), Namespace: nw.GetNamespace(), ResType: v1alpha1.KindNetwork})
+			}
+		}
+		for _, sb := range m.serviceBindings {
+			ag := sb.GetSpec().GetAddressGroup()
+			if ag.GetName() == name && ag.GetNamespace() == ns {
+				svc := sb.GetSpec().GetService()
+				refs = append(refs, &commonpb.ResourceRef{Name: svc.GetName(), Namespace: svc.GetNamespace(), ResType: v1alpha1.KindService})
+			}
+		}
+		ext.Refs = refs
+	}
+}
+
 func fromAddressGroupExtList(items []*sgroupsv1.AddressGroupResp_AddressGroupExt) []*sgroupsv1.AddressGroup {
 	out := make([]*sgroupsv1.AddressGroup, 0, len(items))
 	for _, ag := range items {
@@ -957,6 +1008,24 @@ func toNetworkExtList(items []*sgroupsv1.Network) []*sgroupsv1.NetworkResp_Netwo
 	}
 
 	return out
+}
+
+// fillNetworkRefs computes refs for each Network by scanning network bindings.
+// Must be called while m.mu.RLock is held.
+func (m *MockBackend) fillNetworkRefs(extList []*sgroupsv1.NetworkResp_NetworkExt) {
+	for _, ext := range extList {
+		name := ext.GetMetadata().GetName()
+		ns := ext.GetMetadata().GetNamespace()
+		var refs []*commonpb.ResourceRef
+		for _, nb := range m.networkBindings {
+			nw := nb.GetSpec().GetNetwork()
+			if nw.GetName() == name && nw.GetNamespace() == ns {
+				ag := nb.GetSpec().GetAddressGroup()
+				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: v1alpha1.KindAddressGroup})
+			}
+		}
+		ext.Refs = refs
+	}
 }
 
 func cloneHost(h *sgroupsv1.Host) *sgroupsv1.Host {
@@ -996,6 +1065,24 @@ func toHostExtList(items []*sgroupsv1.Host) []*sgroupsv1.HostResp_HostExt {
 	}
 
 	return out
+}
+
+// fillHostRefs computes refs for each Host by scanning host bindings.
+// Must be called while m.mu.RLock is held.
+func (m *MockBackend) fillHostRefs(extList []*sgroupsv1.HostResp_HostExt) {
+	for _, ext := range extList {
+		name := ext.GetMetadata().GetName()
+		ns := ext.GetMetadata().GetNamespace()
+		var refs []*commonpb.ResourceRef
+		for _, hb := range m.hostBindings {
+			h := hb.GetSpec().GetHost()
+			if h.GetName() == name && h.GetNamespace() == ns {
+				ag := hb.GetSpec().GetAddressGroup()
+				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: v1alpha1.KindAddressGroup})
+			}
+		}
+		ext.Refs = refs
+	}
 }
 
 func fromHostExtList(items []*sgroupsv1.HostResp_HostExt) []*sgroupsv1.Host {
@@ -1784,6 +1871,880 @@ func (h *networkBindingWatchHub) publish(event *sgroupsv1.NetworkBindingResp_Wat
 			continue
 		}
 		resp := &sgroupsv1.NetworkBindingResp_Watch{Type: event.Type, NetworkBindings: filtered}
+		select {
+		case sub.ch <- resp:
+		default:
+		}
+	}
+}
+
+// ---- Service CRUD ----
+
+func (m *MockBackend) UpsertServices(ctx context.Context, req *sgroupsv1.ServiceReq_Upsert) (*sgroupsv1.ServiceResp_Upsert, error) {
+	if req == nil || len(req.Services) == 0 {
+		return nil, errors.New("services are required")
+	}
+	m.mu.Lock()
+	added := make([]*sgroupsv1.Service, 0, len(req.Services))
+	modified := make([]*sgroupsv1.Service, 0, len(req.Services))
+	resp := &sgroupsv1.ServiceResp_Upsert{Services: make([]*sgroupsv1.Service, 0, len(req.Services))}
+	for _, svc := range req.Services {
+		if svc == nil || svc.Metadata == nil {
+			m.mu.Unlock()
+
+			return nil, errors.New("service metadata is required")
+		}
+		stored, isNew := m.upsertServiceLocked(svc)
+		resp.Services = append(resp.Services, cloneService(stored))
+		if isNew {
+			added = append(added, cloneService(stored))
+		} else {
+			modified = append(modified, cloneService(stored))
+		}
+	}
+	m.mu.Unlock()
+
+	if len(added) > 0 {
+		m.svcHub.publish(&sgroupsv1.ServiceResp_Watch{Type: commonpb.WatchEventType_ADDED, Services: toServiceExtList(added)})
+	}
+	if len(modified) > 0 {
+		m.svcHub.publish(&sgroupsv1.ServiceResp_Watch{Type: commonpb.WatchEventType_MODIFIED, Services: toServiceExtList(modified)})
+	}
+
+	return resp, nil
+}
+
+func (m *MockBackend) DeleteServices(ctx context.Context, req *sgroupsv1.ServiceReq_Delete) error {
+	if req == nil || len(req.Services) == 0 {
+		return errors.New("services are required")
+	}
+	m.mu.Lock()
+	deleted := make([]*sgroupsv1.Service, 0, len(req.Services))
+	for _, svc := range req.Services {
+		if svc == nil || svc.Metadata == nil {
+			m.mu.Unlock()
+
+			return errors.New("service delete metadata is required")
+		}
+		uid := svc.Metadata.Uid
+		name := svc.Metadata.Name
+		ns := svc.Metadata.Namespace
+		if uid == "" && (name == "" || ns == "") {
+			m.mu.Unlock()
+
+			return errors.New("service delete requires uid or name+namespace")
+		}
+		if uid != "" {
+			if stored, ok := m.services[uid]; ok {
+				delete(m.services, uid)
+				deleted = append(deleted, cloneService(stored))
+			}
+
+			continue
+		}
+		for id, stored := range m.services {
+			if stored.Metadata != nil && stored.Metadata.Name == name && stored.Metadata.Namespace == ns {
+				delete(m.services, id)
+				deleted = append(deleted, cloneService(stored))
+
+				break
+			}
+		}
+	}
+	m.mu.Unlock()
+
+	if len(deleted) > 0 {
+		m.svcHub.publish(&sgroupsv1.ServiceResp_Watch{Type: commonpb.WatchEventType_DELETED, Services: toServiceExtList(deleted)})
+	}
+
+	return nil
+}
+
+func (m *MockBackend) ListServices(ctx context.Context, req *sgroupsv1.ServiceReq_List) (*sgroupsv1.ServiceResp_List, error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, errors.New("selectors are required")
+	}
+	m.mu.RLock()
+	items := make([]*sgroupsv1.Service, 0, len(m.services))
+	for _, svc := range m.services {
+		items = append(items, svc)
+	}
+
+	filtered := filterServices(req.Selectors, items)
+	extList := toServiceExtList(filtered)
+	m.fillServiceRefs(extList)
+	m.mu.RUnlock()
+
+	return &sgroupsv1.ServiceResp_List{
+		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		Services:        extList,
+	}, nil
+}
+
+func (m *MockBackend) WatchServices(ctx context.Context, req *sgroupsv1.ServiceReq_Watch) (backend.WatchStream[*sgroupsv1.ServiceResp_Watch], error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return backend.WatchStream[*sgroupsv1.ServiceResp_Watch]{}, errors.New("selectors are required")
+	}
+	ch, cancel := m.svcHub.subscribe(req.Selectors, 16)
+
+	m.mu.RLock()
+	items := make([]*sgroupsv1.Service, 0, len(m.services))
+	for _, svc := range m.services {
+		items = append(items, svc)
+	}
+	m.mu.RUnlock()
+
+	snapshot := filterServices(req.Selectors, items)
+	ch <- &sgroupsv1.ServiceResp_Watch{Type: commonpb.WatchEventType_ADDED, Services: toServiceExtList(snapshot)}
+
+	return backend.WatchStream[*sgroupsv1.ServiceResp_Watch]{
+		C:     ch,
+		Close: cancel,
+	}, nil
+}
+
+func (m *MockBackend) upsertServiceLocked(svc *sgroupsv1.Service) (*sgroupsv1.Service, bool) {
+	clone := cloneService(svc)
+	uid := clone.Metadata.Uid
+	if uid == "" {
+		uid = uuid.NewString()
+		clone.Metadata.Uid = uid
+	}
+	existing, ok := m.services[uid]
+	if ok && existing != nil && existing.Metadata != nil {
+		clone.Metadata.CreationTimestamp = existing.Metadata.CreationTimestamp
+	} else if clone.Metadata.CreationTimestamp == nil {
+		clone.Metadata.CreationTimestamp = timestamppb.Now()
+	}
+	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	m.services[uid] = clone
+
+	return clone, !ok
+}
+
+func cloneService(svc *sgroupsv1.Service) *sgroupsv1.Service {
+	if svc == nil {
+		return nil
+	}
+
+	return proto.Clone(svc).(*sgroupsv1.Service) //nolint:forcetypeassert,errcheck // proto.Clone preserves concrete type
+}
+
+func toServiceExtList(items []*sgroupsv1.Service) []*sgroupsv1.ServiceResp_ServiceExt {
+	out := make([]*sgroupsv1.ServiceResp_ServiceExt, 0, len(items))
+	for _, svc := range items {
+		if svc == nil {
+			continue
+		}
+		out = append(out, &sgroupsv1.ServiceResp_ServiceExt{
+			Metadata: svc.GetMetadata(),
+			Spec:     svc.GetSpec(),
+		})
+	}
+
+	return out
+}
+
+// fillServiceRefs computes refs for each Service by scanning service bindings.
+// Must be called while m.mu.RLock is held.
+func (m *MockBackend) fillServiceRefs(extList []*sgroupsv1.ServiceResp_ServiceExt) {
+	for _, ext := range extList {
+		name := ext.GetMetadata().GetName()
+		ns := ext.GetMetadata().GetNamespace()
+		var refs []*commonpb.ResourceRef
+		for _, sb := range m.serviceBindings {
+			svc := sb.GetSpec().GetService()
+			if svc.GetName() == name && svc.GetNamespace() == ns {
+				ag := sb.GetSpec().GetAddressGroup()
+				refs = append(refs, &commonpb.ResourceRef{Name: ag.GetName(), Namespace: ag.GetNamespace(), ResType: v1alpha1.KindAddressGroup})
+			}
+		}
+		ext.Refs = refs
+	}
+}
+
+func fromServiceExtList(items []*sgroupsv1.ServiceResp_ServiceExt) []*sgroupsv1.Service {
+	out := make([]*sgroupsv1.Service, 0, len(items))
+	for _, svc := range items {
+		if svc == nil {
+			continue
+		}
+		out = append(out, &sgroupsv1.Service{
+			Metadata: svc.GetMetadata(),
+			Spec:     svc.GetSpec(),
+		})
+	}
+
+	return out
+}
+
+func filterServices(selectors []*commonpb.ResSelector, items []*sgroupsv1.Service) []*sgroupsv1.Service {
+	if len(selectors) == 0 {
+		return nil
+	}
+	result := make([]*sgroupsv1.Service, 0)
+	for _, svc := range items {
+		if svc == nil || svc.Metadata == nil {
+			continue
+		}
+		if matchServiceSelectors(svc, selectors) {
+			result = append(result, cloneService(svc))
+		}
+	}
+
+	return result
+}
+
+func matchServiceSelectors(svc *sgroupsv1.Service, selectors []*commonpb.ResSelector) bool {
+	for _, sel := range selectors {
+		if sel == nil {
+			continue
+		}
+		if matchServiceSelector(svc, sel) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func matchServiceSelector(svc *sgroupsv1.Service, sel *commonpb.ResSelector) bool {
+	if sel == nil {
+		return false
+	}
+	if fs := sel.FieldSelector; fs != nil {
+		if fs.Name != "" && svc.Metadata.Name != fs.Name {
+			return false
+		}
+		if fs.Namespace != "" && svc.Metadata.Namespace != fs.Namespace {
+			return false
+		}
+		if len(fs.Refs) > 0 {
+			matched := false
+			for _, ref := range fs.Refs {
+				if ref == nil {
+					continue
+				}
+				if ref.Name != "" && svc.Metadata.Name != ref.Name {
+					continue
+				}
+				if ref.Namespace != "" && svc.Metadata.Namespace != ref.Namespace {
+					continue
+				}
+				matched = true
+
+				break
+			}
+			if !matched {
+				return false
+			}
+		}
+	}
+	if len(sel.LabelSelector) > 0 {
+		if !matchLabels(svc.Metadata.Labels, sel.LabelSelector) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// ---- Service Watch Hub ----
+
+type serviceWatchHub struct {
+	mu     sync.Mutex
+	nextID int64
+	subs   map[int64]*serviceWatchSub
+}
+
+type serviceWatchSub struct {
+	selectors []*commonpb.ResSelector
+	ch        chan *sgroupsv1.ServiceResp_Watch
+}
+
+func newServiceWatchHub() *serviceWatchHub {
+	return &serviceWatchHub{subs: make(map[int64]*serviceWatchSub)}
+}
+
+func (h *serviceWatchHub) subscribe(selectors []*commonpb.ResSelector, buffer int) (chan *sgroupsv1.ServiceResp_Watch, func()) {
+	if buffer <= 0 {
+		buffer = 1
+	}
+	h.mu.Lock()
+	h.nextID++
+	id := h.nextID
+	ch := make(chan *sgroupsv1.ServiceResp_Watch, buffer)
+	h.subs[id] = &serviceWatchSub{selectors: selectors, ch: ch}
+	h.mu.Unlock()
+
+	return ch, func() {
+		h.mu.Lock()
+		delete(h.subs, id)
+		h.mu.Unlock()
+	}
+}
+
+func (h *serviceWatchHub) publish(event *sgroupsv1.ServiceResp_Watch) {
+	if event == nil {
+		return
+	}
+	h.mu.Lock()
+	subs := make([]*serviceWatchSub, 0, len(h.subs))
+	for _, sub := range h.subs {
+		subs = append(subs, sub)
+	}
+	h.mu.Unlock()
+
+	for _, sub := range subs {
+		filtered := filterServices(sub.selectors, fromServiceExtList(event.Services))
+		if len(filtered) == 0 {
+			continue
+		}
+		resp := &sgroupsv1.ServiceResp_Watch{Type: event.Type, Services: toServiceExtList(filtered)}
+		select {
+		case sub.ch <- resp:
+		default:
+		}
+	}
+}
+
+// ---- ServiceBinding CRUD ----
+
+func (m *MockBackend) UpsertServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Upsert) (*sgroupsv1.ServiceBindingResp_Upsert, error) {
+	if req == nil || len(req.ServiceBindings) == 0 {
+		return nil, errors.New("service bindings are required")
+	}
+	m.mu.Lock()
+	added := make([]*sgroupsv1.ServiceBinding, 0, len(req.ServiceBindings))
+	modified := make([]*sgroupsv1.ServiceBinding, 0, len(req.ServiceBindings))
+	resp := &sgroupsv1.ServiceBindingResp_Upsert{ServiceBindings: make([]*sgroupsv1.ServiceBinding, 0, len(req.ServiceBindings))}
+	for _, sb := range req.ServiceBindings {
+		if sb == nil || sb.Metadata == nil {
+			m.mu.Unlock()
+
+			return nil, errors.New("service binding metadata is required")
+		}
+		stored, isNew := m.upsertServiceBindingLocked(sb)
+		resp.ServiceBindings = append(resp.ServiceBindings, cloneServiceBinding(stored))
+		if isNew {
+			added = append(added, cloneServiceBinding(stored))
+		} else {
+			modified = append(modified, cloneServiceBinding(stored))
+		}
+	}
+	m.mu.Unlock()
+
+	if len(added) > 0 {
+		m.sbHub.publish(&sgroupsv1.ServiceBindingResp_Watch{Type: commonpb.WatchEventType_ADDED, ServiceBindings: added})
+	}
+	if len(modified) > 0 {
+		m.sbHub.publish(&sgroupsv1.ServiceBindingResp_Watch{Type: commonpb.WatchEventType_MODIFIED, ServiceBindings: modified})
+	}
+
+	return resp, nil
+}
+
+func (m *MockBackend) DeleteServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Delete) error {
+	if req == nil || len(req.ServiceBindings) == 0 {
+		return errors.New("service bindings are required")
+	}
+	m.mu.Lock()
+	deleted := make([]*sgroupsv1.ServiceBinding, 0, len(req.ServiceBindings))
+	for _, sb := range req.ServiceBindings {
+		if sb == nil || sb.Metadata == nil {
+			m.mu.Unlock()
+
+			return errors.New("service binding delete metadata is required")
+		}
+		uid := sb.Metadata.Uid
+		name := sb.Metadata.Name
+		ns := sb.Metadata.Namespace
+		if uid == "" && (name == "" || ns == "") {
+			m.mu.Unlock()
+
+			return errors.New("service binding delete requires uid or name+namespace")
+		}
+		if uid != "" {
+			if stored, ok := m.serviceBindings[uid]; ok {
+				delete(m.serviceBindings, uid)
+				deleted = append(deleted, cloneServiceBinding(stored))
+			}
+
+			continue
+		}
+		for id, stored := range m.serviceBindings {
+			if stored.Metadata != nil && stored.Metadata.Name == name && stored.Metadata.Namespace == ns {
+				delete(m.serviceBindings, id)
+				deleted = append(deleted, cloneServiceBinding(stored))
+
+				break
+			}
+		}
+	}
+	m.mu.Unlock()
+
+	if len(deleted) > 0 {
+		m.sbHub.publish(&sgroupsv1.ServiceBindingResp_Watch{Type: commonpb.WatchEventType_DELETED, ServiceBindings: deleted})
+	}
+
+	return nil
+}
+
+func (m *MockBackend) ListServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_List) (*sgroupsv1.ServiceBindingResp_List, error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, errors.New("selectors are required")
+	}
+	m.mu.RLock()
+	items := make([]*sgroupsv1.ServiceBinding, 0, len(m.serviceBindings))
+	for _, sb := range m.serviceBindings {
+		items = append(items, sb)
+	}
+	m.mu.RUnlock()
+
+	filtered := filterServiceBindings(req.Selectors, items)
+
+	return &sgroupsv1.ServiceBindingResp_List{
+		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		ServiceBindings: filtered,
+	}, nil
+}
+
+func (m *MockBackend) WatchServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Watch) (backend.WatchStream[*sgroupsv1.ServiceBindingResp_Watch], error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return backend.WatchStream[*sgroupsv1.ServiceBindingResp_Watch]{}, errors.New("selectors are required")
+	}
+	ch, cancel := m.sbHub.subscribe(req.Selectors, 16)
+
+	m.mu.RLock()
+	items := make([]*sgroupsv1.ServiceBinding, 0, len(m.serviceBindings))
+	for _, sb := range m.serviceBindings {
+		items = append(items, sb)
+	}
+	m.mu.RUnlock()
+
+	snapshot := filterServiceBindings(req.Selectors, items)
+	ch <- &sgroupsv1.ServiceBindingResp_Watch{Type: commonpb.WatchEventType_ADDED, ServiceBindings: snapshot}
+
+	return backend.WatchStream[*sgroupsv1.ServiceBindingResp_Watch]{
+		C:     ch,
+		Close: cancel,
+	}, nil
+}
+
+func (m *MockBackend) upsertServiceBindingLocked(sb *sgroupsv1.ServiceBinding) (*sgroupsv1.ServiceBinding, bool) {
+	clone := cloneServiceBinding(sb)
+	uid := clone.Metadata.Uid
+	if uid == "" {
+		uid = uuid.NewString()
+		clone.Metadata.Uid = uid
+	}
+	existing, ok := m.serviceBindings[uid]
+	if ok && existing != nil && existing.Metadata != nil {
+		clone.Metadata.CreationTimestamp = existing.Metadata.CreationTimestamp
+	} else if clone.Metadata.CreationTimestamp == nil {
+		clone.Metadata.CreationTimestamp = timestamppb.Now()
+	}
+	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	m.serviceBindings[uid] = clone
+
+	return clone, !ok
+}
+
+func cloneServiceBinding(sb *sgroupsv1.ServiceBinding) *sgroupsv1.ServiceBinding {
+	if sb == nil {
+		return nil
+	}
+
+	return proto.Clone(sb).(*sgroupsv1.ServiceBinding) //nolint:forcetypeassert,errcheck // proto.Clone preserves concrete type
+}
+
+func filterServiceBindings(selectors []*sgroupsv1.ServiceBindingReq_Selectors, items []*sgroupsv1.ServiceBinding) []*sgroupsv1.ServiceBinding {
+	if len(selectors) == 0 {
+		return nil
+	}
+	result := make([]*sgroupsv1.ServiceBinding, 0)
+	for _, sb := range items {
+		if sb == nil || sb.Metadata == nil {
+			continue
+		}
+		if matchServiceBindingSelectors(sb, selectors) {
+			result = append(result, cloneServiceBinding(sb))
+		}
+	}
+
+	return result
+}
+
+func matchServiceBindingSelectors(sb *sgroupsv1.ServiceBinding, selectors []*sgroupsv1.ServiceBindingReq_Selectors) bool {
+	for _, sel := range selectors {
+		if sel == nil {
+			continue
+		}
+		if matchServiceBindingSelector(sb, sel) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func matchServiceBindingSelector(sb *sgroupsv1.ServiceBinding, sel *sgroupsv1.ServiceBindingReq_Selectors) bool {
+	if sel == nil {
+		return false
+	}
+	if fs := sel.FieldSelector; fs != nil {
+		if fs.Name != "" && sb.Metadata.Name != fs.Name {
+			return false
+		}
+		if fs.Namespace != "" && sb.Metadata.Namespace != fs.Namespace {
+			return false
+		}
+		if fs.AddressGroup != nil {
+			ag := sb.GetSpec().GetAddressGroup()
+			if ag == nil {
+				return false
+			}
+			if fs.AddressGroup.Name != "" && ag.Name != fs.AddressGroup.Name {
+				return false
+			}
+			if fs.AddressGroup.Namespace != "" && ag.Namespace != fs.AddressGroup.Namespace {
+				return false
+			}
+		}
+		if fs.Service != nil {
+			svc := sb.GetSpec().GetService()
+			if svc == nil {
+				return false
+			}
+			if fs.Service.Name != "" && svc.Name != fs.Service.Name {
+				return false
+			}
+			if fs.Service.Namespace != "" && svc.Namespace != fs.Service.Namespace {
+				return false
+			}
+		}
+	}
+	if len(sel.LabelSelector) > 0 {
+		if !matchLabels(sb.Metadata.Labels, sel.LabelSelector) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// ---- ServiceBinding Watch Hub ----
+
+type serviceBindingWatchHub struct {
+	mu     sync.Mutex
+	nextID int64
+	subs   map[int64]*serviceBindingWatchSub
+}
+
+type serviceBindingWatchSub struct {
+	selectors []*sgroupsv1.ServiceBindingReq_Selectors
+	ch        chan *sgroupsv1.ServiceBindingResp_Watch
+}
+
+func newServiceBindingWatchHub() *serviceBindingWatchHub {
+	return &serviceBindingWatchHub{subs: make(map[int64]*serviceBindingWatchSub)}
+}
+
+func (h *serviceBindingWatchHub) subscribe(selectors []*sgroupsv1.ServiceBindingReq_Selectors, buffer int) (chan *sgroupsv1.ServiceBindingResp_Watch, func()) {
+	if buffer <= 0 {
+		buffer = 1
+	}
+	h.mu.Lock()
+	h.nextID++
+	id := h.nextID
+	ch := make(chan *sgroupsv1.ServiceBindingResp_Watch, buffer)
+	h.subs[id] = &serviceBindingWatchSub{selectors: selectors, ch: ch}
+	h.mu.Unlock()
+
+	return ch, func() {
+		h.mu.Lock()
+		delete(h.subs, id)
+		h.mu.Unlock()
+	}
+}
+
+func (h *serviceBindingWatchHub) publish(event *sgroupsv1.ServiceBindingResp_Watch) {
+	if event == nil {
+		return
+	}
+	h.mu.Lock()
+	subs := make([]*serviceBindingWatchSub, 0, len(h.subs))
+	for _, sub := range h.subs {
+		subs = append(subs, sub)
+	}
+	h.mu.Unlock()
+
+	for _, sub := range subs {
+		filtered := filterServiceBindings(sub.selectors, event.ServiceBindings)
+		if len(filtered) == 0 {
+			continue
+		}
+		resp := &sgroupsv1.ServiceBindingResp_Watch{Type: event.Type, ServiceBindings: filtered}
+		select {
+		case sub.ch <- resp:
+		default:
+		}
+	}
+}
+
+// ---- Rule CRUD ----
+
+func (m *MockBackend) UpsertRules(ctx context.Context, req *sgroupsv1.RuleReq_Upsert) (*sgroupsv1.RuleResp_Upsert, error) {
+	if req == nil || len(req.Rules) == 0 {
+		return nil, errors.New("rules are required")
+	}
+	m.mu.Lock()
+	added := make([]*sgroupsv1.Rule, 0, len(req.Rules))
+	modified := make([]*sgroupsv1.Rule, 0, len(req.Rules))
+	resp := &sgroupsv1.RuleResp_Upsert{Rules: make([]*sgroupsv1.Rule, 0, len(req.Rules))}
+	for _, r := range req.Rules {
+		if r == nil || r.Metadata == nil {
+			m.mu.Unlock()
+
+			return nil, errors.New("rule metadata is required")
+		}
+		stored, isNew := m.upsertRuleLocked(r)
+		resp.Rules = append(resp.Rules, cloneRule(stored))
+		if isNew {
+			added = append(added, cloneRule(stored))
+		} else {
+			modified = append(modified, cloneRule(stored))
+		}
+	}
+	m.mu.Unlock()
+
+	if len(added) > 0 {
+		m.ruleHub.publish(&sgroupsv1.RuleResp_Watch{Type: commonpb.WatchEventType_ADDED, Rules: added})
+	}
+	if len(modified) > 0 {
+		m.ruleHub.publish(&sgroupsv1.RuleResp_Watch{Type: commonpb.WatchEventType_MODIFIED, Rules: modified})
+	}
+
+	return resp, nil
+}
+
+func (m *MockBackend) DeleteRules(ctx context.Context, req *sgroupsv1.RuleReq_Delete) error {
+	if req == nil || len(req.Rules) == 0 {
+		return errors.New("rules are required")
+	}
+	m.mu.Lock()
+	deleted := make([]*sgroupsv1.Rule, 0, len(req.Rules))
+	for _, r := range req.Rules {
+		if r == nil || r.Metadata == nil {
+			m.mu.Unlock()
+
+			return errors.New("rule delete metadata is required")
+		}
+		uid := r.Metadata.Uid
+		name := r.Metadata.Name
+		ns := r.Metadata.Namespace
+		if uid == "" && (name == "" || ns == "") {
+			m.mu.Unlock()
+
+			return errors.New("rule delete requires uid or name+namespace")
+		}
+		if uid != "" {
+			if stored, ok := m.rules[uid]; ok {
+				delete(m.rules, uid)
+				deleted = append(deleted, cloneRule(stored))
+			}
+
+			continue
+		}
+		for id, stored := range m.rules {
+			if stored.Metadata != nil && stored.Metadata.Name == name && stored.Metadata.Namespace == ns {
+				delete(m.rules, id)
+				deleted = append(deleted, cloneRule(stored))
+
+				break
+			}
+		}
+	}
+	m.mu.Unlock()
+
+	if len(deleted) > 0 {
+		m.ruleHub.publish(&sgroupsv1.RuleResp_Watch{Type: commonpb.WatchEventType_DELETED, Rules: deleted})
+	}
+
+	return nil
+}
+
+func (m *MockBackend) ListRules(ctx context.Context, req *sgroupsv1.RuleReq_List) (*sgroupsv1.RuleResp_List, error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, errors.New("selectors are required")
+	}
+	m.mu.RLock()
+	items := make([]*sgroupsv1.Rule, 0, len(m.rules))
+	for _, r := range m.rules {
+		items = append(items, r)
+	}
+	m.mu.RUnlock()
+
+	filtered := filterRules(req.Selectors, items)
+
+	return &sgroupsv1.RuleResp_List{
+		ResourceVersion: strconv.FormatInt(atomic.LoadInt64(&m.version), 10),
+		Rules:           filtered,
+	}, nil
+}
+
+func (m *MockBackend) WatchRules(ctx context.Context, req *sgroupsv1.RuleReq_Watch) (backend.WatchStream[*sgroupsv1.RuleResp_Watch], error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return backend.WatchStream[*sgroupsv1.RuleResp_Watch]{}, errors.New("selectors are required")
+	}
+	ch, cancel := m.ruleHub.subscribe(req.Selectors, 16)
+
+	m.mu.RLock()
+	items := make([]*sgroupsv1.Rule, 0, len(m.rules))
+	for _, r := range m.rules {
+		items = append(items, r)
+	}
+	m.mu.RUnlock()
+
+	snapshot := filterRules(req.Selectors, items)
+	ch <- &sgroupsv1.RuleResp_Watch{Type: commonpb.WatchEventType_ADDED, Rules: snapshot}
+
+	return backend.WatchStream[*sgroupsv1.RuleResp_Watch]{
+		C:     ch,
+		Close: cancel,
+	}, nil
+}
+
+func (m *MockBackend) upsertRuleLocked(r *sgroupsv1.Rule) (*sgroupsv1.Rule, bool) {
+	clone := cloneRule(r)
+	uid := clone.Metadata.Uid
+	if uid == "" {
+		uid = uuid.NewString()
+		clone.Metadata.Uid = uid
+	}
+	existing, ok := m.rules[uid]
+	if ok && existing != nil && existing.Metadata != nil {
+		clone.Metadata.CreationTimestamp = existing.Metadata.CreationTimestamp
+	} else if clone.Metadata.CreationTimestamp == nil {
+		clone.Metadata.CreationTimestamp = timestamppb.Now()
+	}
+	clone.Metadata.ResourceVersion = strconv.FormatInt(atomic.AddInt64(&m.version, 1), 10)
+	m.rules[uid] = clone
+
+	return clone, !ok
+}
+
+func cloneRule(r *sgroupsv1.Rule) *sgroupsv1.Rule {
+	if r == nil {
+		return nil
+	}
+
+	return proto.Clone(r).(*sgroupsv1.Rule) //nolint:forcetypeassert,errcheck // proto.Clone preserves concrete type
+}
+
+func filterRules(selectors []*sgroupsv1.RuleReq_Selectors, items []*sgroupsv1.Rule) []*sgroupsv1.Rule {
+	if len(selectors) == 0 {
+		return nil
+	}
+	result := make([]*sgroupsv1.Rule, 0)
+	for _, r := range items {
+		if r == nil || r.Metadata == nil {
+			continue
+		}
+		if matchRuleSelectors(r, selectors) {
+			result = append(result, cloneRule(r))
+		}
+	}
+
+	return result
+}
+
+func matchRuleSelectors(r *sgroupsv1.Rule, selectors []*sgroupsv1.RuleReq_Selectors) bool {
+	for _, sel := range selectors {
+		if sel == nil {
+			continue
+		}
+		if matchRuleSelector(r, sel) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func matchRuleSelector(r *sgroupsv1.Rule, sel *sgroupsv1.RuleReq_Selectors) bool {
+	if sel == nil {
+		return false
+	}
+	if fs := sel.FieldSelector; fs != nil {
+		if fs.Name != "" && r.Metadata.Name != fs.Name {
+			return false
+		}
+		if fs.Namespace != "" && r.Metadata.Namespace != fs.Namespace {
+			return false
+		}
+	}
+	if len(sel.LabelSelector) > 0 {
+		if !matchLabels(r.Metadata.Labels, sel.LabelSelector) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// ---- Rule Watch Hub ----
+
+type ruleWatchHub struct {
+	mu     sync.Mutex
+	nextID int64
+	subs   map[int64]*ruleWatchSub
+}
+
+type ruleWatchSub struct {
+	selectors []*sgroupsv1.RuleReq_Selectors
+	ch        chan *sgroupsv1.RuleResp_Watch
+}
+
+func newRuleWatchHub() *ruleWatchHub {
+	return &ruleWatchHub{subs: make(map[int64]*ruleWatchSub)}
+}
+
+func (h *ruleWatchHub) subscribe(selectors []*sgroupsv1.RuleReq_Selectors, buffer int) (chan *sgroupsv1.RuleResp_Watch, func()) {
+	if buffer <= 0 {
+		buffer = 1
+	}
+	h.mu.Lock()
+	h.nextID++
+	id := h.nextID
+	ch := make(chan *sgroupsv1.RuleResp_Watch, buffer)
+	h.subs[id] = &ruleWatchSub{selectors: selectors, ch: ch}
+	h.mu.Unlock()
+
+	return ch, func() {
+		h.mu.Lock()
+		delete(h.subs, id)
+		h.mu.Unlock()
+	}
+}
+
+func (h *ruleWatchHub) publish(event *sgroupsv1.RuleResp_Watch) {
+	if event == nil {
+		return
+	}
+	h.mu.Lock()
+	subs := make([]*ruleWatchSub, 0, len(h.subs))
+	for _, sub := range h.subs {
+		subs = append(subs, sub)
+	}
+	h.mu.Unlock()
+
+	for _, sub := range subs {
+		filtered := filterRules(sub.selectors, event.Rules)
+		if len(filtered) == 0 {
+			continue
+		}
+		resp := &sgroupsv1.RuleResp_Watch{Type: event.Type, Rules: filtered}
 		select {
 		case sub.ch <- resp:
 		default:

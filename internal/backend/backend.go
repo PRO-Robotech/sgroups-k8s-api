@@ -53,6 +53,27 @@ type NetworkBindingBackend interface {
 	WatchNetworkBindings(ctx context.Context, req *sgroupsv1.NetworkBindingReq_Watch) (WatchStream[*sgroupsv1.NetworkBindingResp_Watch], error)
 }
 
+type ServiceBackend interface {
+	UpsertServices(ctx context.Context, req *sgroupsv1.ServiceReq_Upsert) (*sgroupsv1.ServiceResp_Upsert, error)
+	DeleteServices(ctx context.Context, req *sgroupsv1.ServiceReq_Delete) error
+	ListServices(ctx context.Context, req *sgroupsv1.ServiceReq_List) (*sgroupsv1.ServiceResp_List, error)
+	WatchServices(ctx context.Context, req *sgroupsv1.ServiceReq_Watch) (WatchStream[*sgroupsv1.ServiceResp_Watch], error)
+}
+
+type ServiceBindingBackend interface {
+	UpsertServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Upsert) (*sgroupsv1.ServiceBindingResp_Upsert, error)
+	DeleteServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Delete) error
+	ListServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_List) (*sgroupsv1.ServiceBindingResp_List, error)
+	WatchServiceBindings(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Watch) (WatchStream[*sgroupsv1.ServiceBindingResp_Watch], error)
+}
+
+type RuleBackend interface {
+	UpsertRules(ctx context.Context, req *sgroupsv1.RuleReq_Upsert) (*sgroupsv1.RuleResp_Upsert, error)
+	DeleteRules(ctx context.Context, req *sgroupsv1.RuleReq_Delete) error
+	ListRules(ctx context.Context, req *sgroupsv1.RuleReq_List) (*sgroupsv1.RuleResp_List, error)
+	WatchRules(ctx context.Context, req *sgroupsv1.RuleReq_Watch) (WatchStream[*sgroupsv1.RuleResp_Watch], error)
+}
+
 type Backend struct {
 	Namespaces      NamespaceBackend
 	AddressGroups   AddressGroupBackend
@@ -60,4 +81,7 @@ type Backend struct {
 	Hosts           HostBackend
 	HostBindings    HostBindingBackend
 	NetworkBindings NetworkBindingBackend
+	Services        ServiceBackend
+	ServiceBindings ServiceBindingBackend
+	Rules           RuleBackend
 }

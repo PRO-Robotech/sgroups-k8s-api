@@ -53,6 +53,18 @@ type MockNetworkBindingServer struct {
 	backend backend.NetworkBindingBackend
 }
 
+// MockServiceServer implements the SGroupsServicesAPI for tests and local runs.
+type MockServiceServer struct {
+	sgroupsv1.UnimplementedSGroupsServicesAPIServer
+	backend backend.ServiceBackend
+}
+
+// MockServiceBindingServer implements the SGroupsServiceBindingAPI for tests and local runs.
+type MockServiceBindingServer struct {
+	sgroupsv1.UnimplementedSGroupsServiceBindingAPIServer
+	backend backend.ServiceBindingBackend
+}
+
 // Run starts the mock gRPC server.
 func Run(ctx context.Context, addr string, b backend.Backend) error {
 	lis, err := net.Listen("tcp", addr) //nolint:noctx // mock server for local dev, no need for ListenConfig
@@ -85,6 +97,8 @@ func RegisterServices(grpcServer *grpc.Server, b backend.Backend) {
 	sgroupsv1.RegisterSGroupsHostsAPIServer(grpcServer, &MockHostServer{backend: b.Hosts})
 	sgroupsv1.RegisterSGroupsHostBindingAPIServer(grpcServer, &MockHostBindingServer{backend: b.HostBindings})
 	sgroupsv1.RegisterSGroupsNetworkBindingAPIServer(grpcServer, &MockNetworkBindingServer{backend: b.NetworkBindings})
+	sgroupsv1.RegisterSGroupsServicesAPIServer(grpcServer, &MockServiceServer{backend: b.Services})
+	sgroupsv1.RegisterSGroupsServiceBindingAPIServer(grpcServer, &MockServiceBindingServer{backend: b.ServiceBindings})
 }
 
 func (s *MockNamespaceServer) Upsert(ctx context.Context, req *sgroupsv1.NamespaceReq_Upsert) (*sgroupsv1.NamespaceResp_Upsert, error) {
@@ -471,6 +485,142 @@ func (s *MockNetworkBindingServer) Watch(req *sgroupsv1.NetworkBindingReq_Watch,
 		return status.Error(codes.InvalidArgument, "selectors are required")
 	}
 	ws, err := s.backend.WatchNetworkBindings(stream.Context(), req)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if ws.Close != nil {
+			ws.Close()
+		}
+	}()
+
+	for {
+		select {
+		case <-stream.Context().Done():
+			return stream.Context().Err()
+		case evt, ok := <-ws.C:
+			if !ok {
+				return nil
+			}
+			if err := stream.Send(evt); err != nil {
+				return err
+			}
+		}
+	}
+}
+
+func (s *MockServiceServer) Upsert(ctx context.Context, req *sgroupsv1.ServiceReq_Upsert) (*sgroupsv1.ServiceResp_Upsert, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "service backend is not configured")
+	}
+	if req == nil || len(req.Services) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "services are required")
+	}
+
+	return s.backend.UpsertServices(ctx, req)
+}
+
+func (s *MockServiceServer) Delete(ctx context.Context, req *sgroupsv1.ServiceReq_Delete) (*emptypb.Empty, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "service backend is not configured")
+	}
+	if req == nil || len(req.Services) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "services are required")
+	}
+	if err := s.backend.DeleteServices(ctx, req); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *MockServiceServer) List(ctx context.Context, req *sgroupsv1.ServiceReq_List) (*sgroupsv1.ServiceResp_List, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "service backend is not configured")
+	}
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "selectors are required")
+	}
+
+	return s.backend.ListServices(ctx, req)
+}
+
+func (s *MockServiceServer) Watch(req *sgroupsv1.ServiceReq_Watch, stream grpc.ServerStreamingServer[sgroupsv1.ServiceResp_Watch]) error {
+	if s.backend == nil {
+		return status.Error(codes.Unavailable, "service backend is not configured")
+	}
+	if req == nil || len(req.Selectors) == 0 {
+		return status.Error(codes.InvalidArgument, "selectors are required")
+	}
+	ws, err := s.backend.WatchServices(stream.Context(), req)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if ws.Close != nil {
+			ws.Close()
+		}
+	}()
+
+	for {
+		select {
+		case <-stream.Context().Done():
+			return stream.Context().Err()
+		case evt, ok := <-ws.C:
+			if !ok {
+				return nil
+			}
+			if err := stream.Send(evt); err != nil {
+				return err
+			}
+		}
+	}
+}
+
+func (s *MockServiceBindingServer) Upsert(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Upsert) (*sgroupsv1.ServiceBindingResp_Upsert, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "service binding backend is not configured")
+	}
+	if req == nil || len(req.ServiceBindings) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "service bindings are required")
+	}
+
+	return s.backend.UpsertServiceBindings(ctx, req)
+}
+
+func (s *MockServiceBindingServer) Delete(ctx context.Context, req *sgroupsv1.ServiceBindingReq_Delete) (*emptypb.Empty, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "service binding backend is not configured")
+	}
+	if req == nil || len(req.ServiceBindings) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "service bindings are required")
+	}
+	if err := s.backend.DeleteServiceBindings(ctx, req); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *MockServiceBindingServer) List(ctx context.Context, req *sgroupsv1.ServiceBindingReq_List) (*sgroupsv1.ServiceBindingResp_List, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "service binding backend is not configured")
+	}
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "selectors are required")
+	}
+
+	return s.backend.ListServiceBindings(ctx, req)
+}
+
+func (s *MockServiceBindingServer) Watch(req *sgroupsv1.ServiceBindingReq_Watch, stream grpc.ServerStreamingServer[sgroupsv1.ServiceBindingResp_Watch]) error {
+	if s.backend == nil {
+		return status.Error(codes.Unavailable, "service binding backend is not configured")
+	}
+	if req == nil || len(req.Selectors) == 0 {
+		return status.Error(codes.InvalidArgument, "selectors are required")
+	}
+	ws, err := s.backend.WatchServiceBindings(stream.Context(), req)
 	if err != nil {
 		return err
 	}
