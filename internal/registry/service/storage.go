@@ -15,7 +15,7 @@ func NewStorage(c *client.Client, opts registryoptions.StorageOptions) *generic.
 	return generic.NewStorage(
 		&backend{client: c},
 		opts,
-		nil,
+		&serviceStrategy{},
 		func() *v1alpha1.Service { return &v1alpha1.Service{} },
 		func() *v1alpha1.ServiceList { return &v1alpha1.ServiceList{} },
 		"service",

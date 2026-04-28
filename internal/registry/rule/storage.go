@@ -15,7 +15,7 @@ func NewStorage(c *client.Client, opts registryoptions.StorageOptions) *generic.
 	return generic.NewStorage(
 		&backend{client: c},
 		opts,
-		nil,
+		&ruleStrategy{},
 		func() *v1alpha1.Rule { return &v1alpha1.Rule{} },
 		func() *v1alpha1.RuleList { return &v1alpha1.RuleList{} },
 		"rule",
