@@ -25,6 +25,9 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	// unversioned "v1" group — required by InstallAPIGroup.
 	metav1.AddToGroupVersion(scheme, schema.GroupVersion{Version: "v1"})
 
+	internalGV := schema.GroupVersion{Group: GroupName, Version: runtime.APIVersionInternal}
+	scheme.AddKnownTypes(internalGV, KnownTypes()...)
+
 	return nil
 }
 
