@@ -93,6 +93,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		HostBinding{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_HostBinding(ref),
 		HostBindingList{}.OpenAPIModelName():              schema_pkg_apis_sgroups_v1alpha1_HostBindingList(ref),
 		HostBindingSpec{}.OpenAPIModelName():              schema_pkg_apis_sgroups_v1alpha1_HostBindingSpec(ref),
+		HostEndpointPort{}.OpenAPIModelName():             schema_pkg_apis_sgroups_v1alpha1_HostEndpointPort(ref),
+		HostEndpoints{}.OpenAPIModelName():                schema_pkg_apis_sgroups_v1alpha1_HostEndpoints(ref),
 		HostIPs{}.OpenAPIModelName():                      schema_pkg_apis_sgroups_v1alpha1_HostIPs(ref),
 		HostList{}.OpenAPIModelName():                     schema_pkg_apis_sgroups_v1alpha1_HostList(ref),
 		HostMetaInfo{}.OpenAPIModelName():                 schema_pkg_apis_sgroups_v1alpha1_HostMetaInfo(ref),
@@ -3003,11 +3005,17 @@ func schema_pkg_apis_sgroups_v1alpha1_Host(ref common.ReferenceCallback) common.
 							Ref:     ref(HostMetaInfo{}.OpenAPIModelName()),
 						},
 					},
+					"endpoints": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(HostEndpoints{}.OpenAPIModelName()),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1.ObjectMeta{}.OpenAPIModelName(), HostIPs{}.OpenAPIModelName(), HostMetaInfo{}.OpenAPIModelName(), HostSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
+			v1.ObjectMeta{}.OpenAPIModelName(), HostEndpoints{}.OpenAPIModelName(), HostIPs{}.OpenAPIModelName(), HostMetaInfo{}.OpenAPIModelName(), HostSpec{}.OpenAPIModelName(), ResourceRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -3143,6 +3151,70 @@ func schema_pkg_apis_sgroups_v1alpha1_HostBindingSpec(ref common.ReferenceCallba
 		},
 		Dependencies: []string{
 			ResourceIdentifier{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_HostEndpointPort(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HostEndpointPort is a named port exposed by a Host endpoint (read-only).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Default: 0,
+							Type:    []string{"integer"},
+							Format:  "int64",
+						},
+					},
+				},
+				Required: []string{"name", "port"},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_HostEndpoints(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HostEndpoints describes endpoints published by a Host (read-only). If Address is empty, the backend falls back to the peer address observed on the gRPC connection from the host agent.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"address": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(HostEndpointPort{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"address", "ports"},
+			},
+		},
+		Dependencies: []string{
+			HostEndpointPort{}.OpenAPIModelName()},
 	}
 }
 

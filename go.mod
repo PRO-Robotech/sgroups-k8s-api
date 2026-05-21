@@ -3,7 +3,7 @@ module sgroups.io/sgroups-k8s-api
 go 1.25.0
 
 require (
-	github.com/PRO-Robotech/sgroups-proto v0.1.0
+	github.com/PRO-Robotech/sgroups-proto v0.0.0-20260508133152-1ad78f8a1af8
 	github.com/google/uuid v1.6.0
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1

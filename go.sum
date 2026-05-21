@@ -6,6 +6,8 @@ github.com/Masterminds/semver/v3 v3.4.0 h1:Zog+i5UMtVoCU8oKka5P7i9q9HgrJeGzI9SA1
 github.com/Masterminds/semver/v3 v3.4.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260508133152-1ad78f8a1af8 h1:0vLXmVua5P/k9x5pUQA/UIZ60OyUa8Ep2TsTU4//c7g=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260508133152-1ad78f8a1af8/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/PRO-Robotech/sgroups-proto v0.1.0 h1:7HWETaFGL/spLfO32cPZ1/2u0sqNimVZ+Dysar13xTI=
 github.com/PRO-Robotech/sgroups-proto v0.1.0/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=

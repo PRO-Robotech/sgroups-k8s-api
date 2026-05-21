@@ -74,7 +74,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.AddressGroupList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroupList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroupList"
                 }
               }
             }
@@ -146,7 +151,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostBindingList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBindingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBindingList"
                 }
               }
             }
@@ -218,7 +228,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostList"
                 }
               }
             }
@@ -290,7 +305,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.AddressGroupList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroupList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroupList"
                 }
               }
             }
@@ -309,7 +329,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
               }
             }
           },
@@ -321,7 +346,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
                 }
               }
             }
@@ -354,7 +384,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
                 }
               }
             }
@@ -373,7 +408,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
               }
             }
           },
@@ -385,7 +425,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
                 }
               }
             }
@@ -405,7 +450,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -422,9 +472,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
               }
             }
           },
@@ -436,7 +496,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.AddressGroup"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup"
                 }
               }
             }
@@ -528,7 +593,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostBindingList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBindingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBindingList"
                 }
               }
             }
@@ -547,7 +617,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
               }
             }
           },
@@ -559,7 +634,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
                 }
               }
             }
@@ -592,7 +672,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
                 }
               }
             }
@@ -611,7 +696,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
               }
             }
           },
@@ -623,7 +713,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
                 }
               }
             }
@@ -643,7 +738,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -660,9 +760,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
               }
             }
           },
@@ -674,7 +784,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding"
                 }
               }
             }
@@ -766,7 +881,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.HostList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostList"
                 }
               }
             }
@@ -785,7 +905,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Host"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
               }
             }
           },
@@ -797,7 +922,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Host"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
                 }
               }
             }
@@ -830,7 +960,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Host"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
                 }
               }
             }
@@ -849,7 +984,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Host"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
               }
             }
           },
@@ -861,7 +1001,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Host"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
                 }
               }
             }
@@ -881,7 +1026,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -898,9 +1048,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Host"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
               }
             }
           },
@@ -912,7 +1072,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Host"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host"
                 }
               }
             }
@@ -1004,7 +1169,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkBindingList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingList"
                 }
               }
             }
@@ -1023,7 +1193,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
               }
             }
           },
@@ -1035,7 +1210,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
                 }
               }
             }
@@ -1068,7 +1248,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
                 }
               }
             }
@@ -1087,7 +1272,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
               }
             }
           },
@@ -1099,7 +1289,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
                 }
               }
             }
@@ -1119,7 +1314,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -1136,9 +1336,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
               }
             }
           },
@@ -1150,7 +1360,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding"
                 }
               }
             }
@@ -1242,7 +1457,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkList"
                 }
               }
             }
@@ -1261,7 +1481,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Network"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
               }
             }
           },
@@ -1273,7 +1498,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Network"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
                 }
               }
             }
@@ -1306,7 +1536,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Network"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
                 }
               }
             }
@@ -1325,7 +1560,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Network"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
               }
             }
           },
@@ -1337,7 +1577,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Network"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
                 }
               }
             }
@@ -1357,7 +1602,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -1374,9 +1624,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Network"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
               }
             }
           },
@@ -1388,7 +1648,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Network"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network"
                 }
               }
             }
@@ -1480,7 +1745,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.RuleList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleList"
                 }
               }
             }
@@ -1499,7 +1769,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Rule"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
               }
             }
           },
@@ -1511,7 +1786,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Rule"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
                 }
               }
             }
@@ -1544,7 +1824,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Rule"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
                 }
               }
             }
@@ -1563,7 +1848,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Rule"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
               }
             }
           },
@@ -1575,7 +1865,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Rule"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
                 }
               }
             }
@@ -1595,7 +1890,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -1612,9 +1912,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Rule"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
               }
             }
           },
@@ -1626,7 +1936,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Rule"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule"
                 }
               }
             }
@@ -1718,7 +2033,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceBindingList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingList"
                 }
               }
             }
@@ -1737,7 +2057,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
               }
             }
           },
@@ -1749,7 +2074,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
                 }
               }
             }
@@ -1782,7 +2112,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
                 }
               }
             }
@@ -1801,7 +2136,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
               }
             }
           },
@@ -1813,7 +2153,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
                 }
               }
             }
@@ -1833,7 +2178,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -1850,9 +2200,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
               }
             }
           },
@@ -1864,7 +2224,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceBinding"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding"
                 }
               }
             }
@@ -1956,7 +2321,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceList"
                 }
               }
             }
@@ -1975,7 +2345,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Service"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
               }
             }
           },
@@ -1987,7 +2362,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Service"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
                 }
               }
             }
@@ -2020,7 +2400,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Service"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
                 }
               }
             }
@@ -2039,7 +2424,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Service"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
               }
             }
           },
@@ -2051,7 +2441,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Service"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
                 }
               }
             }
@@ -2071,7 +2466,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -2088,9 +2488,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Service"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
               }
             }
           },
@@ -2102,7 +2512,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Service"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Service"
                 }
               }
             }
@@ -2194,7 +2609,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkBindingList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingList"
                 }
               }
             }
@@ -2266,7 +2686,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.NetworkList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkList"
                 }
               }
             }
@@ -2338,7 +2763,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.RuleList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleList"
                 }
               }
             }
@@ -2410,7 +2840,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceBindingList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingList"
                 }
               }
             }
@@ -2482,7 +2917,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.ServiceList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceList"
                 }
               }
             }
@@ -2554,7 +2994,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.TenantList"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TenantList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TenantList"
                 }
               }
             }
@@ -2573,7 +3018,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Tenant"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
               }
             }
           },
@@ -2585,7 +3035,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Tenant"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
                 }
               }
             }
@@ -2607,7 +3062,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Tenant"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
                 }
               }
             }
@@ -2626,7 +3086,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Tenant"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
               }
             }
           },
@@ -2638,7 +3103,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Tenant"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
                 }
               }
             }
@@ -2658,7 +3128,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1.Status"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             }
@@ -2675,9 +3150,19 @@
         "requestBody": {
           "description": "Patch body",
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
-                "$ref": "#/components/schemas/v1alpha1.Tenant"
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+              }
+            },
+            "application/merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+              }
+            },
+            "application/strategic-merge-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
               }
             }
           },
@@ -2689,7 +3174,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/v1alpha1.Tenant"
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant"
                 }
               }
             }
@@ -2934,18 +3424,116 @@
         },
         "x-kubernetes-map-type": "atomic"
       },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.Status": {
+        "description": "Status is a return value for calls that don't return other objects.",
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            "type": "string"
+          },
+          "code": {
+            "description": "Suggested HTTP return code for this status, 0 if not set.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "details": {
+            "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
+              }
+            ]
+          },
+          "kind": {
+            "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
+          },
+          "message": {
+            "description": "A human-readable description of the status of this operation.",
+            "type": "string"
+          },
+          "metadata": {
+            "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+              }
+            ]
+          },
+          "reason": {
+            "description": "A machine-readable description of why this operation is in the \"Failure\" status. If this value is empty there is no information available. A Reason clarifies an HTTP status code but does not override it.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of the operation. One of: \"Success\" or \"Failure\". More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+            "type": "string"
+          }
+        }
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause": {
+        "description": "StatusCause provides more information about an api.Status failure, including cases when multiple errors are encountered.",
+        "type": "object",
+        "properties": {
+          "field": {
+            "description": "The field of the resource that has caused this error, as named by its JSON serialization. May include dot and postfix notation for nested attributes. Arrays are zero-indexed.  Fields may appear more than once in an array of causes due to fields having multiple errors. Optional.\n\nExamples:\n  \"name\" - the field \"name\" on the current resource\n  \"items[0].name\" - the field \"name\" on the first array entry in \"items\"",
+            "type": "string"
+          },
+          "message": {
+            "description": "A human-readable description of the cause of the error.  This field may be presented as-is to a reader.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "A machine-readable description of the cause of the error. If this value is empty there is no information available.",
+            "type": "string"
+          }
+        }
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails": {
+        "description": "StatusDetails is a set of additional properties that MAY be set by the server to provide additional information about a response. The Reason field of a Status object defines what attributes will be set. Clients must ignore fields that do not match the defined type of each attribute, and should assume that any attribute may be empty, invalid, or under defined.",
+        "type": "object",
+        "properties": {
+          "causes": {
+            "description": "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes.",
+            "type": "array",
+            "items": {
+              "default": {},
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
+                }
+              ]
+            },
+            "x-kubernetes-list-type": "atomic"
+          },
+          "group": {
+            "description": "The group attribute of the resource associated with the status StatusReason.",
+            "type": "string"
+          },
+          "kind": {
+            "description": "The kind attribute of the resource associated with the status StatusReason. On some operations may differ from the requested resource Kind. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name attribute of the resource associated with the status StatusReason (when there is a single name which can be described).",
+            "type": "string"
+          },
+          "retryAfterSeconds": {
+            "description": "If specified, the time in seconds before the operation should be retried. Some errors may indicate the client must take an alternate action - for those errors this field may indicate how long to wait before taking the alternate action.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "uid": {
+            "description": "UID of the resource. (when there is a single resource which can be described). More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids",
+            "type": "string"
+          }
+        }
+      },
       "io.k8s.apimachinery.pkg.apis.meta.v1.Time": {
         "description": "Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.",
         "type": "string",
         "format": "date-time"
-      },
-      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Action": {
-        "description": "Action (Allow or Deny)",
-        "type": "string",
-        "enum": [
-          "Allow",
-          "Deny"
-        ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup": {
         "description": "AddressGroup represents an address group resource.",
@@ -2985,6 +3573,27 @@
                 "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroupSpec"
               }
             ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "AddressGroup",
+          "metadata": {
+            "name": "web-servers",
+            "namespace": "production",
+            "resourceVersion": "5"
+          },
+          "refs": [
+            {
+              "kind": "Host",
+              "name": "web-01",
+              "namespace": "production"
+            }
+          ],
+          "spec": {
+            "defaultAction": "Allow",
+            "displayName": "Web Servers",
+            "logs": true
           }
         }
       },
@@ -3050,17 +3659,13 @@
           "trace": {
             "type": "boolean"
           }
+        },
+        "example": {
+          "defaultAction": "Allow",
+          "displayName": "Web Servers",
+          "logs": true,
+          "trace": false
         }
-      },
-      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.EndpointType": {
-        "description": "Endpoint type (AddressGroup, Service, FQDN, or CIDR)",
-        "type": "string",
-        "enum": [
-          "AddressGroup",
-          "Service",
-          "FQDN",
-          "CIDR"
-        ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Host": {
         "description": "Host represents a host resource.",
@@ -3069,6 +3674,14 @@
           "apiVersion": {
             "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
             "type": "string"
+          },
+          "endpoints": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostEndpoints"
+              }
+            ]
           },
           "ips": {
             "default": {},
@@ -3117,6 +3730,43 @@
               }
             ]
           }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "endpoints": {
+            "address": "10.0.0.1",
+            "ports": [
+              {
+                "name": "api",
+                "port": 8443
+              }
+            ]
+          },
+          "ips": {
+            "IPv4": [
+              "10.0.0.1"
+            ]
+          },
+          "kind": "Host",
+          "metaInfo": {
+            "hostName": "web-01.prod.local",
+            "os": "linux"
+          },
+          "metadata": {
+            "name": "web-01",
+            "namespace": "production",
+            "resourceVersion": "3"
+          },
+          "refs": [
+            {
+              "kind": "AddressGroup",
+              "name": "web-servers",
+              "namespace": "production"
+            }
+          ],
+          "spec": {
+            "displayName": "Web Server 01"
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBinding": {
@@ -3146,6 +3796,26 @@
                 "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostBindingSpec"
               }
             ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "HostBinding",
+          "metadata": {
+            "name": "web-01-to-web-servers",
+            "namespace": "production",
+            "resourceVersion": "9"
+          },
+          "spec": {
+            "addressGroup": {
+              "name": "web-servers",
+              "namespace": "production"
+            },
+            "displayName": "Web-01 to Web-Servers",
+            "host": {
+              "name": "web-01",
+              "namespace": "production"
+            }
           }
         }
       },
@@ -3214,6 +3884,78 @@
               }
             ]
           }
+        },
+        "example": {
+          "addressGroup": {
+            "name": "web-servers",
+            "namespace": "production"
+          },
+          "displayName": "Web-01 to Web-Servers",
+          "host": {
+            "name": "web-01",
+            "namespace": "production"
+          }
+        }
+      },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostEndpointPort": {
+        "description": "HostEndpointPort is a named port exposed by a Host endpoint (read-only).",
+        "type": "object",
+        "required": [
+          "name",
+          "port"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": ""
+          },
+          "port": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0
+          }
+        },
+        "example": {
+          "name": "api",
+          "port": 8443
+        }
+      },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostEndpoints": {
+        "description": "HostEndpoints describes endpoints published by a Host (read-only). If Address is empty, the backend falls back to the peer address observed on the gRPC connection from the host agent.",
+        "type": "object",
+        "required": [
+          "address",
+          "ports"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "default": ""
+          },
+          "ports": {
+            "type": "array",
+            "items": {
+              "default": {},
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostEndpointPort"
+                }
+              ]
+            }
+          }
+        },
+        "example": {
+          "address": "10.0.0.1",
+          "ports": [
+            {
+              "name": "api",
+              "port": 8443
+            },
+            {
+              "name": "metrics",
+              "port": 9090
+            }
+          ]
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostIPs": {
@@ -3238,6 +3980,14 @@
               "default": ""
             }
           }
+        },
+        "example": {
+          "IPv4": [
+            "10.0.0.1"
+          ],
+          "IPv6": [
+            "fe80::1"
+          ]
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostList": {
@@ -3312,6 +4062,11 @@
             "type": "string",
             "default": ""
           }
+        },
+        "example": {
+          "hostName": "web-01.prod.local",
+          "os": "linux",
+          "platform": "ubuntu"
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.HostSpec": {
@@ -3327,15 +4082,11 @@
           "displayName": {
             "type": "string"
           }
+        },
+        "example": {
+          "comment": "Primary web server",
+          "displayName": "Web Server 01"
         }
-      },
-      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.IpAddrFamily": {
-        "description": "IP address family (IPv4 or IPv6)",
-        "type": "string",
-        "enum": [
-          "IPv4",
-          "IPv6"
-        ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Network": {
         "description": "Network represents a network resource.",
@@ -3376,6 +4127,26 @@
               }
             ]
           }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "Network",
+          "metadata": {
+            "name": "corp-lan",
+            "namespace": "production",
+            "resourceVersion": "7"
+          },
+          "refs": [
+            {
+              "kind": "AddressGroup",
+              "name": "web-servers",
+              "namespace": "production"
+            }
+          ],
+          "spec": {
+            "CIDR": "10.10.0.0/16",
+            "displayName": "Corp LAN"
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBinding": {
@@ -3405,6 +4176,26 @@
                 "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkBindingSpec"
               }
             ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "NetworkBinding",
+          "metadata": {
+            "name": "corp-lan-to-web-servers",
+            "namespace": "production",
+            "resourceVersion": "11"
+          },
+          "spec": {
+            "addressGroup": {
+              "name": "web-servers",
+              "namespace": "production"
+            },
+            "displayName": "Corp-LAN to Web-Servers",
+            "network": {
+              "name": "corp-lan",
+              "namespace": "production"
+            }
           }
         }
       },
@@ -3473,6 +4264,17 @@
               }
             ]
           }
+        },
+        "example": {
+          "addressGroup": {
+            "name": "web-servers",
+            "namespace": "production"
+          },
+          "displayName": "Corp-LAN to Web-Servers",
+          "network": {
+            "name": "corp-lan",
+            "namespace": "production"
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NetworkList": {
@@ -3527,16 +4329,11 @@
           "displayName": {
             "type": "string"
           }
+        },
+        "example": {
+          "CIDR": "10.10.0.0/16",
+          "displayName": "Corp LAN"
         }
-      },
-      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Protocol": {
-        "description": "Network transport protocol (TCP, UDP, or ICMP)",
-        "type": "string",
-        "enum": [
-          "TCP",
-          "UDP",
-          "ICMP"
-        ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier": {
         "description": "ResourceIdentifier identifies a resource by name and namespace.",
@@ -3548,6 +4345,10 @@
           "namespace": {
             "type": "string"
           }
+        },
+        "example": {
+          "name": "web-servers",
+          "namespace": "production"
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceRef": {
@@ -3563,6 +4364,11 @@
           "namespace": {
             "type": "string"
           }
+        },
+        "example": {
+          "kind": "Host",
+          "name": "web-01",
+          "namespace": "production"
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Rule": {
@@ -3592,6 +4398,27 @@
                 "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleSpec"
               }
             ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "Rule",
+          "metadata": {
+            "name": "allow-web-to-db-http",
+            "namespace": "production",
+            "resourceVersion": "20"
+          },
+          "spec": {
+            "action": "Allow",
+            "displayName": "Allow HTTP from web to DB",
+            "transport": {
+              "entries": [
+                {
+                  "ports": "80,443"
+                }
+              ],
+              "protocol": "TCP"
+            }
           }
         }
       },
@@ -3717,6 +4544,33 @@
           "transport": {
             "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleTransport"
           }
+        },
+        "example": {
+          "action": "Allow",
+          "displayName": "Allow HTTP from web to DB",
+          "endpoints": {
+            "local": {
+              "name": "web-servers",
+              "namespace": "production",
+              "type": "AddressGroup"
+            },
+            "remote": {
+              "name": "db-servers",
+              "namespace": "production",
+              "type": "AddressGroup"
+            }
+          },
+          "session": {
+            "traffic": "Ingress"
+          },
+          "transport": {
+            "entries": [
+              {
+                "ports": "80,443"
+              }
+            ],
+            "protocol": "TCP"
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.RuleTransport": {
@@ -3790,6 +4644,35 @@
               }
             ]
           }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "Service",
+          "metadata": {
+            "name": "web-service",
+            "namespace": "production",
+            "resourceVersion": "13"
+          },
+          "refs": [
+            {
+              "kind": "AddressGroup",
+              "name": "web-servers",
+              "namespace": "production"
+            }
+          ],
+          "spec": {
+            "displayName": "Web Service",
+            "transports": [
+              {
+                "entries": [
+                  {
+                    "ports": "80,443"
+                  }
+                ],
+                "protocol": "TCP"
+              }
+            ]
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBinding": {
@@ -3819,6 +4702,26 @@
                 "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceBindingSpec"
               }
             ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "ServiceBinding",
+          "metadata": {
+            "name": "web-service-to-web-servers",
+            "namespace": "production",
+            "resourceVersion": "14"
+          },
+          "spec": {
+            "addressGroup": {
+              "name": "web-servers",
+              "namespace": "production"
+            },
+            "displayName": "Web-Service to Web-Servers",
+            "service": {
+              "name": "web-service",
+              "namespace": "production"
+            }
           }
         }
       },
@@ -3887,6 +4790,17 @@
               }
             ]
           }
+        },
+        "example": {
+          "addressGroup": {
+            "name": "web-servers",
+            "namespace": "production"
+          },
+          "displayName": "Web-Service to Web-Servers",
+          "service": {
+            "name": "web-service",
+            "namespace": "production"
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceList": {
@@ -3949,6 +4863,21 @@
               ]
             }
           }
+        },
+        "example": {
+          "displayName": "Web Service",
+          "transports": [
+            {
+              "IPv": "IPv4",
+              "entries": [
+                {
+                  "description": "HTTP traffic",
+                  "ports": "80,443"
+                }
+              ],
+              "protocol": "TCP"
+            }
+          ]
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceTransport": {
@@ -3981,6 +4910,16 @@
               "ICMP"
             ]
           }
+        },
+        "example": {
+          "IPv": "IPv4",
+          "entries": [
+            {
+              "description": "HTTP traffic",
+              "ports": "80,443"
+            }
+          ],
+          "protocol": "TCP"
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ServiceTransportEntry": {
@@ -4053,6 +4992,18 @@
               }
             ]
           }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "kind": "Tenant",
+          "metadata": {
+            "name": "production",
+            "resourceVersion": "1"
+          },
+          "spec": {
+            "comment": "Production environment tenant",
+            "displayName": "Production"
+          }
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TenantList": {
@@ -4104,16 +5055,12 @@
           "displayName": {
             "type": "string"
           }
+        },
+        "example": {
+          "comment": "Production environment tenant",
+          "description": "Contains production workloads and services",
+          "displayName": "Production"
         }
-      },
-      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Traffic": {
-        "description": "Traffic direction (Both, Ingress, or Egress)",
-        "type": "string",
-        "enum": [
-          "Both",
-          "Ingress",
-          "Egress"
-        ]
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.TransportEntry": {
         "description": "TransportEntry represents a transport entry (ports or ICMP types).",

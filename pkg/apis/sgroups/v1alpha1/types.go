@@ -160,6 +160,20 @@ type HostMetaInfo struct {
 	KernelVersion   string `json:"kernelVersion"`
 }
 
+// HostEndpointPort is a named port exposed by a Host endpoint (read-only).
+type HostEndpointPort struct {
+	Name string `json:"name"`
+	Port uint32 `json:"port"`
+}
+
+// HostEndpoints describes endpoints published by a Host (read-only).
+// If Address is empty, the backend falls back to the peer address observed
+// on the gRPC connection from the host agent.
+type HostEndpoints struct {
+	Address string             `json:"address"`
+	Ports   []HostEndpointPort `json:"ports"`
+}
+
 // HostSpec defines the desired state of a Host.
 type HostSpec struct {
 	DisplayName string `json:"displayName,omitempty"`
@@ -176,6 +190,7 @@ type Host struct {
 	Refs              []ResourceRef `json:"refs,omitempty"`
 	IPs               HostIPs       `json:"ips,omitempty"`
 	MetaInfo          HostMetaInfo  `json:"metaInfo,omitempty"`
+	Endpoints         HostEndpoints `json:"endpoints,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -432,6 +447,8 @@ func (NetworkBindingSpec) OpenAPIModelName() string { return OpenAPIPrefix + "Ne
 func (ResourceIdentifier) OpenAPIModelName() string { return OpenAPIPrefix + "ResourceIdentifier" }
 func (ResourceRef) OpenAPIModelName() string        { return OpenAPIPrefix + "ResourceRef" }
 func (HostIPs) OpenAPIModelName() string            { return OpenAPIPrefix + "HostIPs" }
+func (HostEndpoints) OpenAPIModelName() string      { return OpenAPIPrefix + "HostEndpoints" }
+func (HostEndpointPort) OpenAPIModelName() string   { return OpenAPIPrefix + "HostEndpointPort" }
 func (HostMetaInfo) OpenAPIModelName() string       { return OpenAPIPrefix + "HostMetaInfo" }
 func (Service) OpenAPIModelName() string            { return OpenAPIPrefix + "Service" }
 func (ServiceList) OpenAPIModelName() string        { return OpenAPIPrefix + "ServiceList" }
