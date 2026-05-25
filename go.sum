@@ -8,6 +8,12 @@ github.com/NYTimes/gziphandler v1.1.1 h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cq
 github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
 github.com/PRO-Robotech/sgroups-proto v0.0.0-20260508133152-1ad78f8a1af8 h1:0vLXmVua5P/k9x5pUQA/UIZ60OyUa8Ep2TsTU4//c7g=
 github.com/PRO-Robotech/sgroups-proto v0.0.0-20260508133152-1ad78f8a1af8/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260522121749-7dc8676c77f1 h1:SJwVXn1G7tZgW9ryfW7UflmvRfWuNuwbjk7sFhPom2Q=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260522121749-7dc8676c77f1/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260522154506-6d7e09d3ab6e h1:b+W/283hY3g1MkLUTVhyudEEQMp9Uf7lIuLKTOTRna0=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260522154506-6d7e09d3ab6e/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260523225833-e1430e9539be h1:G6cOU5HcQlJBOVkS60714kOrRE0isbBF3/EiJ6kP2c0=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260523225833-e1430e9539be/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/PRO-Robotech/sgroups-proto v0.1.0 h1:7HWETaFGL/spLfO32cPZ1/2u0sqNimVZ+Dysar13xTI=
 github.com/PRO-Robotech/sgroups-proto v0.1.0/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=

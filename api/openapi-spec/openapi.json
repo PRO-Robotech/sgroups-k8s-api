@@ -1105,6 +1105,71 @@
         }
       ]
     },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/hosts/{name}/sockstats": {
+      "get": {
+        "tags": [
+          "sgroups_host"
+        ],
+        "summary": "Read socket statistics from a Host",
+        "description": "Reads the socket statistics aggregated from the host-agent. With ?watch=true the response is a stream.",
+        "operationId": "getHostSocketStats",
+        "parameters": [
+          {
+            "name": "selector",
+            "in": "query",
+            "description": "Filter expression as comma-separated key=value pairs. Multiple selector parameters are OR-joined. Keys: protocol, family, state, localAddr, localPort, remoteAddr, remotePort, ifname, inode, pid, comm.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "watch",
+            "in": "query",
+            "description": "If true, the response is a stream of newline-delimited SocketStatList objects.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.SocketStatList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.SocketStatList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "namespace",
+          "in": "path",
+          "description": "Namespace of the Host.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of the Host.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/networkbindings": {
       "get": {
         "tags": [
@@ -4335,6 +4400,39 @@
           "displayName": "Corp LAN"
         }
       },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Process": {
+        "description": "Process represents a kernel-reported process that owns a socket.",
+        "type": "object",
+        "required": [
+          "pid"
+        ],
+        "properties": {
+          "cmdLine": {
+            "type": "string"
+          },
+          "comm": {
+            "type": "string"
+          },
+          "exe": {
+            "type": "string"
+          },
+          "fd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pid": {
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          }
+        },
+        "example": {
+          "comm": "nginx",
+          "exe": "/usr/sbin/nginx",
+          "fd": 6,
+          "pid": 200
+        }
+      },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier": {
         "description": "ResourceIdentifier identifies a resource by name and namespace.",
         "type": "object",
@@ -4962,6 +5060,120 @@
           "description": {
             "type": "string"
           }
+        }
+      },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.SocketStat": {
+        "description": "SocketStat is a single socket-statistics entry returned by a host-agent.",
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string"
+          },
+          "ifname": {
+            "type": "string"
+          },
+          "inode": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "localAddr": {
+            "type": "string"
+          },
+          "localPort": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "processes": {
+            "type": "array",
+            "items": {
+              "default": {},
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Process"
+                }
+              ]
+            }
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "remoteAddr": {
+            "type": "string"
+          },
+          "remotePort": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "family": "IPv4",
+          "inode": 2,
+          "localAddr": "0.0.0.0",
+          "localPort": 80,
+          "processes": [
+            {
+              "comm": "nginx",
+              "pid": 200
+            }
+          ],
+          "protocol": "tcp",
+          "state": "Listen"
+        }
+      },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.SocketStatList": {
+        "description": "SocketStatList is the list response for the sockstats subresource. Also used as the per-event payload for watch (one event = batch of stats).",
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "default": {},
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.SocketStat"
+                }
+              ]
+            }
+          },
+          "kind": {
+            "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
+          },
+          "metadata": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+              }
+            ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "items": [
+            {
+              "localPort": 80,
+              "processes": [
+                {
+                  "comm": "nginx",
+                  "pid": 200
+                }
+              ],
+              "protocol": "tcp",
+              "state": "Listen"
+            }
+          ],
+          "kind": "SocketStatList"
         }
       },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Tenant": {

@@ -105,6 +105,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		NetworkBindingSpec{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_NetworkBindingSpec(ref),
 		NetworkList{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_NetworkList(ref),
 		NetworkSpec{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_NetworkSpec(ref),
+		Process{}.OpenAPIModelName():                      schema_pkg_apis_sgroups_v1alpha1_Process(ref),
 		ResourceIdentifier{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_ResourceIdentifier(ref),
 		ResourceRef{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_ResourceRef(ref),
 		Rule{}.OpenAPIModelName():                         schema_pkg_apis_sgroups_v1alpha1_Rule(ref),
@@ -122,6 +123,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		ServiceSpec{}.OpenAPIModelName():                  schema_pkg_apis_sgroups_v1alpha1_ServiceSpec(ref),
 		ServiceTransport{}.OpenAPIModelName():             schema_pkg_apis_sgroups_v1alpha1_ServiceTransport(ref),
 		ServiceTransportEntry{}.OpenAPIModelName():        schema_pkg_apis_sgroups_v1alpha1_ServiceTransportEntry(ref),
+		SocketStat{}.OpenAPIModelName():                   schema_pkg_apis_sgroups_v1alpha1_SocketStat(ref),
+		SocketStatList{}.OpenAPIModelName():               schema_pkg_apis_sgroups_v1alpha1_SocketStatList(ref),
+		SocketStatOptions{}.OpenAPIModelName():            schema_pkg_apis_sgroups_v1alpha1_SocketStatOptions(ref),
+		SocketStatSelector{}.OpenAPIModelName():           schema_pkg_apis_sgroups_v1alpha1_SocketStatSelector(ref),
 		Tenant{}.OpenAPIModelName():                       schema_pkg_apis_sgroups_v1alpha1_Tenant(ref),
 		TenantList{}.OpenAPIModelName():                   schema_pkg_apis_sgroups_v1alpha1_TenantList(ref),
 		TenantSpec{}.OpenAPIModelName():                   schema_pkg_apis_sgroups_v1alpha1_TenantSpec(ref),
@@ -3671,6 +3676,51 @@ func schema_pkg_apis_sgroups_v1alpha1_NetworkSpec(ref common.ReferenceCallback) 
 	}
 }
 
+func schema_pkg_apis_sgroups_v1alpha1_Process(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Process represents a kernel-reported process that owns a socket.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"pid": {
+						SchemaProps: spec.SchemaProps{
+							Default: 0,
+							Type:    []string{"integer"},
+							Format:  "int32",
+						},
+					},
+					"comm": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"cmdLine": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"exe": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"fd": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+				},
+				Required: []string{"pid"},
+			},
+		},
+	}
+}
+
 func schema_pkg_apis_sgroups_v1alpha1_ResourceIdentifier(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4368,6 +4418,266 @@ func schema_pkg_apis_sgroups_v1alpha1_ServiceTransportEntry(ref common.Reference
 									},
 								},
 							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_SocketStat(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SocketStat is a single socket-statistics entry returned by a host-agent.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"family": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"localAddr": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"localPort": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"remoteAddr": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"remotePort": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"ifname": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"inode": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"processes": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(Process{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			Process{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_SocketStatList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SocketStatList is the list response for the sockstats subresource. Also used as the per-event payload for watch (one event = batch of stats).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(SocketStat{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1.ListMeta{}.OpenAPIModelName(), SocketStat{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_SocketStatOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SocketStatOptions is the body/query payload for the sockstats subresource. Watch toggles between list and watch behavior — same URL pattern as Pod log.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"watch": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Watch turns the request into a stream of SocketStatList chunks.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"selectors": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Selectors are OR-joined filters; empty means \"all\".",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(SocketStatSelector{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			SocketStatSelector{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_sgroups_v1alpha1_SocketStatSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SocketStatSelector is a single-statistic filter accepted by the subresource. Empty fields are wildcards. Multiple selectors in a request are OR-joined.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"family": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"localAddr": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"localPort": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"remoteAddr": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"remotePort": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"ifname": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"inode": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+					"pid": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"comm": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
 				},
