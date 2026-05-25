@@ -15,8 +15,16 @@ var SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha
 // SchemeBuilder registers our types.
 var SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 
-// AddToScheme adds all types to the scheme.
+// AddToScheme registers v1alpha1 + internal version.
 var AddToScheme = SchemeBuilder.AddToScheme
+
+// AddToWireScheme registers only the v1alpha1 wire version.
+func AddToWireScheme(scheme *runtime.Scheme) error {
+	scheme.AddKnownTypes(SchemeGroupVersion, KnownTypes()...)
+	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+
+	return nil
+}
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion, KnownTypes()...)
