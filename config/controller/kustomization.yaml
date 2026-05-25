@@ -13,3 +13,8 @@ resources:
   - rbac.yaml
   - aggregation-roles.yaml
   - manager.yaml
+  - deletion-protection.yaml
+  # Optional. Enable when Prometheus Operator is installed in-cluster:
+  # - servicemonitor.yaml
+  # Optional. Enable for cluster-wide deny-by-default NetworkPolicy:
+  # - networkpolicy.yaml
