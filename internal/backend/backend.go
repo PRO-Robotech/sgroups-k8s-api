@@ -37,6 +37,12 @@ type HostBackend interface {
 	DeleteHosts(ctx context.Context, req *sgroupsv1.HostReq_Delete) error
 	ListHosts(ctx context.Context, req *sgroupsv1.HostReq_List) (*sgroupsv1.HostResp_List, error)
 	WatchHosts(ctx context.Context, req *sgroupsv1.HostReq_Watch) (WatchStream[*sgroupsv1.HostResp_Watch], error)
+	ListSocketStatistics(
+		ctx context.Context, req *sgroupsv1.HostReq_SocketStatistics_List,
+	) (*sgroupsv1.HostResp_SocketStatistics_List, error)
+	WatchSocketStatistics(
+		ctx context.Context, req *sgroupsv1.HostReq_SocketStatistics_Watch,
+	) (WatchStream[*sgroupsv1.HostResp_SocketStatistics_Watch], error)
 }
 
 type HostBindingBackend interface {
