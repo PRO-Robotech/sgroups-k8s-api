@@ -28,7 +28,18 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	internalGV := schema.GroupVersion{Group: GroupName, Version: runtime.APIVersionInternal}
 	scheme.AddKnownTypes(internalGV, KnownTypes()...)
 
+	scheme.AddKnownTypes(SchemeGroupVersion, subresourceKnownTypes()...)
+	scheme.AddKnownTypes(internalGV, subresourceKnownTypes()...)
+
 	return nil
+}
+
+// subresourceKnownTypes returns runtime objects returned by subresource
+// storages.
+func subresourceKnownTypes() []runtime.Object {
+	return []runtime.Object{
+		&SocketStatList{},
+	}
 }
 
 // Resource returns a GroupResource for the given resource.
