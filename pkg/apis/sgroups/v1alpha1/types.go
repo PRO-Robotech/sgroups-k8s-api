@@ -497,7 +497,8 @@ type SocketStat struct {
 type SocketStatList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SocketStat `json:"items"`
+	Host            ResourceIdentifier `json:"host,omitempty"`
+	Items           []SocketStat       `json:"items"`
 }
 
 // ---------- OpenAPIModelName ----------

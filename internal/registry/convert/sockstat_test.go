@@ -47,6 +47,8 @@ func TestSocketStatListFromProto(t *testing.T) {
 	require.NotNil(t, out)
 	require.Equal(t, v1alpha1.KindSocketStatList, out.Kind)
 	require.Equal(t, v1alpha1.SchemeGroupVersion.String(), out.APIVersion)
+	require.Equal(t, "host-1", out.Host.Name)
+	require.Equal(t, "default", out.Host.Namespace)
 	require.Len(t, out.Items, 2)
 
 	require.Equal(t, "tcp", out.Items[0].Protocol)
@@ -64,6 +66,8 @@ func TestSocketStatListFromProtoEmpty(t *testing.T) {
 	out := SocketStatListFromProto(nil)
 	require.NotNil(t, out)
 	require.Empty(t, out.Items)
+	require.Empty(t, out.Host.Name)
+	require.Empty(t, out.Host.Namespace)
 }
 
 func TestSocketStatListFromProtoSingleEntry(t *testing.T) {
@@ -82,6 +86,7 @@ func TestSocketStatListFromProtoSingleEntry(t *testing.T) {
 	}
 
 	out := SocketStatListFromProto(in)
+	require.Equal(t, "expected", out.Host.Name, "host attribution comes from hosts[0]")
 	require.Len(t, out.Items, 1, "only the first host's stats should appear")
 	require.Equal(t, int32(80), out.Items[0].LocalPort)
 }

@@ -969,6 +969,7 @@ func (in *SocketStatList) DeepCopyInto(out *SocketStatList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	out.Host = in.Host
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]SocketStat, len(*in))

@@ -4535,6 +4535,12 @@ func schema_pkg_apis_sgroups_v1alpha1_SocketStatList(ref common.ReferenceCallbac
 							Ref:     ref(v1.ListMeta{}.OpenAPIModelName()),
 						},
 					},
+					"host": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref(ResourceIdentifier{}.OpenAPIModelName()),
+						},
+					},
 					"items": {
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"array"},
@@ -4553,7 +4559,7 @@ func schema_pkg_apis_sgroups_v1alpha1_SocketStatList(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			v1.ListMeta{}.OpenAPIModelName(), SocketStat{}.OpenAPIModelName()},
+			v1.ListMeta{}.OpenAPIModelName(), ResourceIdentifier{}.OpenAPIModelName(), SocketStat{}.OpenAPIModelName()},
 	}
 }
 

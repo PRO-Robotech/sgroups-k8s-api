@@ -8,7 +8,8 @@ import (
 	"sgroups.io/sgroups-k8s-api/pkg/apis/sgroups/v1alpha1"
 )
 
-// SocketStatListFromProto flattens hosts[0].stats into a K8s SocketStatList.
+// SocketStatListFromProto flattens hosts[0].stats into a K8s SocketStatList
+// and surfaces the host name/namespace as top-level attribution.
 // Extra hosts are ignored — subresource queries a single host by URL.
 func SocketStatListFromProto(in []*sgroupsv1.HostResp_SocketStatistics_Host) *v1alpha1.SocketStatList {
 	out := &v1alpha1.SocketStatList{
@@ -24,6 +25,10 @@ func SocketStatListFromProto(in []*sgroupsv1.HostResp_SocketStatistics_Host) *v1
 	first := in[0]
 	if first == nil {
 		return out
+	}
+	out.Host = v1alpha1.ResourceIdentifier{
+		Name:      first.GetName(),
+		Namespace: first.GetNamespace(),
 	}
 	stats := first.GetStats()
 	out.Items = make([]v1alpha1.SocketStat, 0, len(stats))
