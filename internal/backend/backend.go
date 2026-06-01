@@ -43,6 +43,12 @@ type HostBackend interface {
 	WatchSocketStatistics(
 		ctx context.Context, req *sgroupsv1.HostReq_SocketStatistics_Watch,
 	) (WatchStream[*sgroupsv1.HostResp_SocketStatistics_Watch], error)
+	ListNft(
+		ctx context.Context, req *sgroupsv1.HostReq_Nft_List,
+	) (*sgroupsv1.HostResp_Nft_List, error)
+	WatchNft(
+		ctx context.Context, req *sgroupsv1.HostReq_Nft_Watch,
+	) (WatchStream[*sgroupsv1.HostResp_Nft_Watch], error)
 }
 
 type HostBindingBackend interface {

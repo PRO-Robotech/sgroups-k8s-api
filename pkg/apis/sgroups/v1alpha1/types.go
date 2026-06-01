@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Resource kind constants.
@@ -21,6 +22,9 @@ const (
 	KindSocketStat        = "SocketStat"
 	KindSocketStatList    = "SocketStatList"
 	KindSocketStatOptions = "SocketStatOptions"
+
+	KindNft     = "Nft"
+	KindNftList = "NftList"
 
 	KindHostBinding     = "HostBinding"
 	KindHostBindingList = "HostBindingList"
@@ -52,6 +56,9 @@ const (
 
 	// SubresourceHostSocketStats is the subresource name for hosts/sockstats.
 	SubresourceHostSocketStats = "sockstats"
+
+	// SubresourceHostNft is the subresource name for hosts/nft.
+	SubresourceHostNft = "nft"
 )
 
 // Action represents the default action for an AddressGroup.
@@ -501,6 +508,29 @@ type SocketStatList struct {
 	Items           []SocketStat       `json:"items"`
 }
 
+// NftOptions is the hosts/nft query payload; Watch is the only knob (no selectors).
+type NftOptions struct {
+	Watch bool `json:"watch,omitempty"`
+}
+
+// Nft is one host's nftables ruleset, as reported by the host-agent.
+type Nft struct {
+	// Text is the `nft list ruleset` output.
+	Text string `json:"text,omitempty"`
+	// JSON is the `nft -j` ruleset as structured JSON; pointer so it omits
+	// (not "json": null) when no parseable JSON is returned.
+	JSON *runtime.RawExtension `json:"json,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// NftList is the hosts/nft list response (and per-event watch payload).
+type NftList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Host            ResourceIdentifier `json:"host,omitempty"`
+	Items           []Nft              `json:"items"`
+}
+
 // ---------- OpenAPIModelName ----------
 // The Kubernetes DefinitionNamer converts Go import paths (slashes) to
 // dot-separated names. Types must implement OpenAPIModelName to match,
@@ -558,3 +588,5 @@ func (SocketStatList) OpenAPIModelName() string     { return OpenAPIPrefix + "So
 func (SocketStatOptions) OpenAPIModelName() string  { return OpenAPIPrefix + "SocketStatOptions" }
 func (SocketStatSelector) OpenAPIModelName() string { return OpenAPIPrefix + "SocketStatSelector" }
 func (Process) OpenAPIModelName() string            { return OpenAPIPrefix + "Process" }
+func (Nft) OpenAPIModelName() string                { return OpenAPIPrefix + "Nft" }
+func (NftList) OpenAPIModelName() string            { return OpenAPIPrefix + "NftList" }

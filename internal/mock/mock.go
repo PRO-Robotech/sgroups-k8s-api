@@ -584,6 +584,69 @@ func (m *MockBackend) WatchSocketStatistics(ctx context.Context, req *sgroupsv1.
 	}, nil
 }
 
+// ListNft returns a fabricated ruleset per selected host so the subresource
+// has something to surface end-to-end.
+func (m *MockBackend) ListNft(ctx context.Context, req *sgroupsv1.HostReq_Nft_List) (*sgroupsv1.HostResp_Nft_List, error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, errors.New("selectors are required")
+	}
+
+	return &sgroupsv1.HostResp_Nft_List{
+		Hosts: m.fabricatedNftHosts(req.GetSelectors()),
+	}, nil
+}
+
+// WatchNft emits one snapshot and then idles — enough to exercise the
+// streaming path in tests.
+func (m *MockBackend) WatchNft(ctx context.Context, req *sgroupsv1.HostReq_Nft_Watch) (backend.WatchStream[*sgroupsv1.HostResp_Nft_Watch], error) {
+	if req == nil || len(req.Selectors) == 0 {
+		return backend.WatchStream[*sgroupsv1.HostResp_Nft_Watch]{}, errors.New("selectors are required")
+	}
+
+	ch := make(chan *sgroupsv1.HostResp_Nft_Watch, 1)
+	ch <- &sgroupsv1.HostResp_Nft_Watch{
+		Hosts: m.fabricatedNftHosts(req.GetSelectors()),
+	}
+
+	return backend.WatchStream[*sgroupsv1.HostResp_Nft_Watch]{
+		C:     ch,
+		Close: func() { close(ch) },
+	}, nil
+}
+
+// fabricatedNftHosts builds a Host-wrapped ruleset per selector. Selectors
+// pointing at unknown hosts are silently dropped (matching how the real
+// backend handles fan-out to an unreachable agent).
+func (m *MockBackend) fabricatedNftHosts(selectors []*sgroupsv1.HostReq_Nft_FieldSelector) []*sgroupsv1.HostResp_Nft_Host {
+	out := make([]*sgroupsv1.HostResp_Nft_Host, 0, len(selectors))
+	for _, sel := range selectors {
+		if sel == nil {
+			continue
+		}
+		if !m.hostExists(sel.GetName(), sel.GetNamespace()) {
+			continue
+		}
+		out = append(out, &sgroupsv1.HostResp_Nft_Host{
+			Name:      sel.GetName(),
+			Namespace: sel.GetNamespace(),
+			Nft:       fabricateNftables(),
+		})
+	}
+
+	return out
+}
+
+// fabricateNftables returns a deterministic single-ruleset dataset in both
+// text and json form, so the subresource exercises the structured-JSON path.
+func fabricateNftables() []*agentv1.Nftables {
+	return []*agentv1.Nftables{
+		{
+			Text: "table inet filter {\n\tchain input {\n\t\ttype filter hook input priority 0; policy drop;\n\t}\n}\n",
+			Json: `{"nftables":[{"table":{"family":"inet","name":"filter","handle":1}}]}`,
+		},
+	}
+}
+
 // fabricatedSocketStatsHosts builds a Host-wrapped response per selector.
 // Selectors pointing at unknown hosts are silently dropped (matching how the
 // real backend handles fan-out to an unreachable agent).

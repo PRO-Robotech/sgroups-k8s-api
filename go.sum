@@ -14,6 +14,8 @@ github.com/PRO-Robotech/sgroups-proto v0.0.0-20260522154506-6d7e09d3ab6e h1:b+W/
 github.com/PRO-Robotech/sgroups-proto v0.0.0-20260522154506-6d7e09d3ab6e/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/PRO-Robotech/sgroups-proto v0.0.0-20260523225833-e1430e9539be h1:G6cOU5HcQlJBOVkS60714kOrRE0isbBF3/EiJ6kP2c0=
 github.com/PRO-Robotech/sgroups-proto v0.0.0-20260523225833-e1430e9539be/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260529175517-ae56c1e8b793 h1:NB7bO8hFgsFCy8s2CDgN+ZEIKv+EJ2lTXMxRzCPLLkE=
+github.com/PRO-Robotech/sgroups-proto v0.0.0-20260529175517-ae56c1e8b793/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/PRO-Robotech/sgroups-proto v0.1.0 h1:7HWETaFGL/spLfO32cPZ1/2u0sqNimVZ+Dysar13xTI=
 github.com/PRO-Robotech/sgroups-proto v0.1.0/go.mod h1:1XBRmQiRvPbzmD1flXFhiwGywqQ+5B3bR5cZEp8m7jg=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=

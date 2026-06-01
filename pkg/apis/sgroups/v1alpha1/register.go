@@ -39,6 +39,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 func subresourceKnownTypes() []runtime.Object {
 	return []runtime.Object{
 		&SocketStatList{},
+		&NftList{},
 	}
 }
 

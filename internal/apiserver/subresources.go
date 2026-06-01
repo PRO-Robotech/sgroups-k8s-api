@@ -3,6 +3,7 @@ package apiserver
 import (
 	"k8s.io/apiserver/pkg/registry/rest"
 
+	"sgroups.io/sgroups-k8s-api/internal/registry/host/nft"
 	"sgroups.io/sgroups-k8s-api/internal/registry/host/sockstats"
 	registryoptions "sgroups.io/sgroups-k8s-api/internal/registry/options"
 	"sgroups.io/sgroups-k8s-api/pkg/apis/sgroups/v1alpha1"
@@ -18,4 +19,5 @@ func installSubresources(m map[string]map[string]rest.Storage, c *client.Client,
 		return
 	}
 	v1alpha1Map["hosts/"+v1alpha1.SubresourceHostSocketStats] = sockstats.NewStorage(c, opts)
+	v1alpha1Map["hosts/"+v1alpha1.SubresourceHostNft] = nft.NewStorage(c, opts)
 }

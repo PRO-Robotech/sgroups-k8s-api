@@ -11,6 +11,8 @@ import (
 // SocketStatListFromProto flattens hosts[0].stats into a K8s SocketStatList
 // and surfaces the host name/namespace as top-level attribution.
 // Extra hosts are ignored — subresource queries a single host by URL.
+//
+//nolint:dupl // parallel subresource list-converter; mirrors NftListFromProto by design.
 func SocketStatListFromProto(in []*sgroupsv1.HostResp_SocketStatistics_Host) *v1alpha1.SocketStatList {
 	out := &v1alpha1.SocketStatList{
 		TypeMeta: metav1.TypeMeta{

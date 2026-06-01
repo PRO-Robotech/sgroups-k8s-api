@@ -1105,6 +1105,63 @@
         }
       ]
     },
+    "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/hosts/{name}/nft": {
+      "get": {
+        "tags": [
+          "sgroups_host"
+        ],
+        "summary": "Read the nftables ruleset from a Host",
+        "description": "Reads the nftables ruleset aggregated from the host-agent, in both text and structured-JSON form. With ?watch=true the response is a stream.",
+        "operationId": "getHostNft",
+        "parameters": [
+          {
+            "name": "watch",
+            "in": "query",
+            "description": "If true, the response is a stream of newline-delimited NftList objects.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NftList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NftList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "namespace",
+          "in": "path",
+          "description": "Namespace of the Host.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "name",
+          "in": "path",
+          "description": "Name of the Host.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/apis/sgroups.io/v1alpha1/namespaces/{namespace}/hosts/{name}/sockstats": {
       "get": {
         "tags": [
@@ -3600,6 +3657,10 @@
         "type": "string",
         "format": "date-time"
       },
+      "io.k8s.apimachinery.pkg.runtime.RawExtension": {
+        "description": "RawExtension is used to hold extensions in external versions.\n\nTo use this, make a field which has RawExtension as its type in your external, versioned struct, and Object in your internal struct. You also need to register your various plugin types.\n\n// Internal package:\n\n\ttype MyAPIObject struct {\n\t\truntime.TypeMeta `json:\",inline\"`\n\t\tMyPlugin runtime.Object `json:\"myPlugin\"`\n\t}\n\n\ttype PluginA struct {\n\t\tAOption string `json:\"aOption\"`\n\t}\n\n// External package:\n\n\ttype MyAPIObject struct {\n\t\truntime.TypeMeta `json:\",inline\"`\n\t\tMyPlugin runtime.RawExtension `json:\"myPlugin\"`\n\t}\n\n\ttype PluginA struct {\n\t\tAOption string `json:\"aOption\"`\n\t}\n\n// On the wire, the JSON will look something like this:\n\n\t{\n\t\t\"kind\":\"MyAPIObject\",\n\t\t\"apiVersion\":\"v1\",\n\t\t\"myPlugin\": {\n\t\t\t\"kind\":\"PluginA\",\n\t\t\t\"aOption\":\"foo\",\n\t\t},\n\t}\n\nSo what happens? Decode first uses json or yaml to unmarshal the serialized data into your external MyAPIObject. That causes the raw JSON to be stored, but not unpacked. The next step is to copy (using pkg/conversion) into the internal struct. The runtime package's DefaultScheme has conversion functions installed which will unpack the JSON stored in RawExtension, turning it into the correct object type, and storing it in the Object. (TODO: In the case where the object is of an unknown type, a runtime.Unknown object will be created and stored.)",
+        "type": "object"
+      },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.AddressGroup": {
         "description": "AddressGroup represents an address group resource.",
         "type": "object",
@@ -4400,6 +4461,106 @@
           "displayName": "Corp LAN"
         }
       },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Nft": {
+        "description": "Nft is one host's nftables ruleset, as reported by the host-agent.",
+        "type": "object",
+        "properties": {
+          "json": {
+            "description": "JSON is the `nft -j` ruleset as structured JSON; pointer so it omits (not \"json\": null) when no parseable JSON is returned.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.runtime.RawExtension"
+              }
+            ]
+          },
+          "text": {
+            "description": "Text is the `nft list ruleset` output.",
+            "type": "string"
+          }
+        },
+        "example": {
+          "json": {
+            "nftables": [
+              {
+                "table": {
+                  "family": "inet",
+                  "handle": 1,
+                  "name": "filter"
+                }
+              }
+            ]
+          },
+          "text": "table inet filter {\n}\n"
+        }
+      },
+      "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.NftList": {
+        "description": "NftList is the hosts/nft list response (and per-event watch payload).",
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            "type": "string"
+          },
+          "host": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier"
+              }
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "default": {},
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Nft"
+                }
+              ]
+            }
+          },
+          "kind": {
+            "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
+          },
+          "metadata": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+              }
+            ]
+          }
+        },
+        "example": {
+          "apiVersion": "sgroups.io/v1alpha1",
+          "host": {
+            "name": "web-01",
+            "namespace": "production"
+          },
+          "items": [
+            {
+              "json": {
+                "nftables": [
+                  {
+                    "table": {
+                      "family": "inet",
+                      "handle": 1,
+                      "name": "filter"
+                    }
+                  }
+                ]
+              },
+              "text": "table inet filter {\n}\n"
+            }
+          ],
+          "kind": "NftList"
+        }
+      },
       "sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.Process": {
         "description": "Process represents a kernel-reported process that owns a socket.",
         "type": "object",
@@ -5133,6 +5294,14 @@
           "apiVersion": {
             "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
             "type": "string"
+          },
+          "host": {
+            "default": {},
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/sgroups.io.sgroups-k8s-api.pkg.apis.sgroups.v1alpha1.ResourceIdentifier"
+              }
+            ]
           },
           "items": {
             "type": "array",

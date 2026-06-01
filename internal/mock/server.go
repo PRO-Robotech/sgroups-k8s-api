@@ -416,6 +416,49 @@ func (s *MockHostServer) WatchSocketStatistics(req *sgroupsv1.HostReq_SocketStat
 	}
 }
 
+func (s *MockHostServer) ListNft(ctx context.Context, req *sgroupsv1.HostReq_Nft_List) (*sgroupsv1.HostResp_Nft_List, error) {
+	if s.backend == nil {
+		return nil, status.Error(codes.Unavailable, "host backend is not configured")
+	}
+	if req == nil || len(req.Selectors) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "selectors are required")
+	}
+
+	return s.backend.ListNft(ctx, req)
+}
+
+func (s *MockHostServer) WatchNft(req *sgroupsv1.HostReq_Nft_Watch, stream grpc.ServerStreamingServer[sgroupsv1.HostResp_Nft_Watch]) error {
+	if s.backend == nil {
+		return status.Error(codes.Unavailable, "host backend is not configured")
+	}
+	if req == nil || len(req.Selectors) == 0 {
+		return status.Error(codes.InvalidArgument, "selectors are required")
+	}
+	ws, err := s.backend.WatchNft(stream.Context(), req)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if ws.Close != nil {
+			ws.Close()
+		}
+	}()
+
+	for {
+		select {
+		case <-stream.Context().Done():
+			return stream.Context().Err()
+		case evt, ok := <-ws.C:
+			if !ok {
+				return nil
+			}
+			if err := stream.Send(evt); err != nil {
+				return err
+			}
+		}
+	}
+}
+
 func (s *MockHostBindingServer) Upsert(ctx context.Context, req *sgroupsv1.HostBindingReq_Upsert) (*sgroupsv1.HostBindingResp_Upsert, error) {
 	if s.backend == nil {
 		return nil, status.Error(codes.Unavailable, "host binding backend is not configured")
